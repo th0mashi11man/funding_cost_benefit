@@ -9,55 +9,50 @@
       margin: 30px;
       max-width: 600px;
     }
-
     h1 {
       margin-bottom: 10px;
     }
-
     label {
       display: block;
       margin-top: 1em;
     }
-
-    /* All fields as text so we can apply custom formatting. */
     input, select {
       width: 100%;
       padding: 8px;
       margin-top: 0.5em;
       box-sizing: border-box;
     }
-
     .radio-group {
       display: flex;
       gap: 1em;
       margin-top: 0.5em;
     }
-
     .radio-group input {
       width: auto;
       margin-top: 0.2em;
     }
-
     button {
       margin-top: 1.5em;
       padding: 10px;
       cursor: pointer;
       font-size: 1rem;
     }
-
+    .info-text {
+      margin-top: 0.5em;
+      font-style: italic;
+      color: #555;
+    }
     .result {
       margin-top: 2em;
       padding: 10px;
       background: #f9f9f9;
       border: 1px solid #ccc;
     }
-
     #resultEvaluation {
       font-size: 1.2rem;
       font-weight: bold;
       margin-bottom: 0.5em;
     }
-
     .hidden {
       display: none;
     }
@@ -68,42 +63,31 @@
 <h1>Research Funding Financial Attractiveness Calculator</h1>
 
 <div>
-  <!-- 1. Amount to be applied for -->
-  <label for="requestedAmount">
-    Amount to be applied for:
-  </label>
-  <input
-    type="text"
-    id="requestedAmount"
-    placeholder="e.g. 1000000"
-    onblur="formatInputValue(this)"
-  />
-
-  <!-- 2. Amount allocated to existing staff salaries -->
-  <label for="existingSalaries">
-    Amount allocated to existing staff salaries:
-  </label>
-  <input
-    type="text"
-    id="existingSalaries"
-    placeholder="e.g. 600000"
-    onblur="formatInputValue(this)"
-  />
-
-  <!-- 3. Department overhead rate (%) -->
+  <!-- 1) Department overhead rate (on total cost) -->
   <label for="deptOverheadPercent">
-    Department overhead rate (%):
+    1. Department overhead rate (%):
   </label>
   <input
     type="text"
     id="deptOverheadPercent"
     placeholder="e.g. 25"
-    onblur="formatInputValue(this)"
+    onblur="formatInputValueAndRecompute(this)"
   />
 
-  <!-- 4. Select overhead coverage type (percent or absolute) -->
+  <!-- 2) Total requested amount -->
+  <label for="requestedAmount">
+    2. Total project budget:
+  </label>
+  <input
+    type="text"
+    id="requestedAmount"
+    placeholder="e.g. 1 000 000"
+    onblur="formatInputValueAndRecompute(this)"
+  />
+
+  <!-- 3) Funder overhead coverage type -->
   <label>
-    How is the funder's overhead contribution given?
+    3. How is the funder's overhead contribution given?
   </label>
   <div class="radio-group">
     <label>
@@ -112,7 +96,7 @@
         name="fundingCoverageType"
         value="percent"
         checked
-        onclick="toggleCoverageInput()"
+        onchange="toggleCoverageInput(); updateLeftoverDisplay();"
       />
       Percentage
     </label>
@@ -121,7 +105,7 @@
         type="radio"
         name="fundingCoverageType"
         value="absolute"
-        onclick="toggleCoverageInput()"
+        onchange="toggleCoverageInput(); updateLeftoverDisplay();"
       />
       Fixed Amount
     </label>
@@ -130,57 +114,77 @@
   <!-- Overhead coverage as percent -->
   <div id="coveragePercentContainer">
     <label for="fundingOverheadPercent">
-      Overhead covered by funding (%):
+      Funder overhead coverage (%):
     </label>
     <input
       type="text"
       id="fundingOverheadPercent"
       placeholder="e.g. 15"
-      onblur="formatInputValue(this)"
+      onblur="formatInputValueAndRecompute(this)"
     />
   </div>
 
-  <!-- Overhead coverage as absolute amount -->
+  <!-- Overhead coverage as fixed amount -->
   <div id="coverageAbsoluteContainer" class="hidden">
     <label for="fundingOverheadAbsolute">
-      Overhead covered by funding (absolute):
+      Funder overhead coverage (fixed):
     </label>
     <input
       type="text"
       id="fundingOverheadAbsolute"
-      placeholder="e.g. 150000"
-      onblur="formatInputValue(this)"
+      placeholder="e.g. 150 000"
+      onblur="formatInputValueAndRecompute(this)"
     />
   </div>
-  
+
+
+  <!-- 5) Existing salaries (with clamping) -->
+  <label for="existingSalaries">
+    5. Total amount allocated to cover salaries for existing staff:
+  </label>
+<!-- 4) Display leftover for direct costs = requested - coverageUsed -->
+  <p class="info-text">
+    Budget remaining for direct costs (salaries, etc.):
+    <strong id="leftoverDisplay">-</strong>
+  </p>
+  <input
+    type="text"
+    id="existingSalaries"
+    placeholder="e.g. 600 000"
+    onblur="formatInputValueAndClamp(this)"
+  />
+
+  <!-- 6) Calculate button -->
   <button onclick="calculateAttractiveness()">
     Calculate financial attractiveness
   </button>
 
   <div class="result hidden" id="resultContainer">
-    <!-- Prominent evaluation -->
     <div id="resultEvaluation"></div>
-    <!-- Worded explanation -->
     <p id="resultExplanation"></p>
   </div>
 </div>
 
 <script>
+  /********************************************************
+   * HELPER FUNCTIONS
+   *******************************************************/
   /**
-   * Toggle which coverage input is visible (percent vs. absolute).
+   * Insert spaces as thousand separators in an integer.
+   * Example: 1000000 -> "1 000 000"
    */
-  function toggleCoverageInput() {
-    const coverageType = document.querySelector('input[name="fundingCoverageType"]:checked').value;
-    const percentContainer = document.getElementById('coveragePercentContainer');
-    const absoluteContainer = document.getElementById('coverageAbsoluteContainer');
+  function addSpaceThousandSeparators(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
 
-    if (coverageType === 'percent') {
-      percentContainer.classList.remove('hidden');
-      absoluteContainer.classList.add('hidden');
-    } else {
-      percentContainer.classList.add('hidden');
-      absoluteContainer.classList.remove('hidden');
-    }
+  /**
+   * Parse a string with space thousand separators back to an integer.
+   */
+  function parseSpaceSeparatedInt(str) {
+    if (!str) return 0;
+    const cleaned = str.replace(/\s+/g, '');
+    const val = parseInt(cleaned, 10);
+    return isNaN(val) ? 0 : val;
   }
 
   /**
@@ -202,46 +206,124 @@
   }
 
   /**
-   * Parse a string with space thousand separators back to an integer.
+   * On blur, format the field and then update leftover if needed.
    */
-  function parseSpaceSeparatedInt(str) {
-    if (!str) return 0;
-    const cleaned = str.replace(/\s+/g, '');
-    const val = parseInt(cleaned, 10);
-    return isNaN(val) ? 0 : val;
+  function formatInputValueAndRecompute(inputEl) {
+    formatInputValue(inputEl);
+    updateLeftoverDisplay();
   }
 
   /**
-   * Format an integer with spaces as thousand separators.
-   * Example: 1000000 -> "1 000 000"
+   * Show/hide overhead coverage input (percent vs. absolute).
    */
-  function addSpaceThousandSeparators(num) {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-  }
-
-  /**
-   * Main function to calculate the attractiveness once the user clicks the button.
-   */
-  function calculateAttractiveness() {
-    const requestedAmount     = parseSpaceSeparatedInt(document.getElementById('requestedAmount').value);
-    const existingSalaries    = parseSpaceSeparatedInt(document.getElementById('existingSalaries').value);
-    const deptOverheadPercent = parseSpaceSeparatedInt(document.getElementById('deptOverheadPercent').value);
-    const coverageType        = document.querySelector('input[name="fundingCoverageType"]:checked').value;
-
-    let coFinancingRequired = 0;
+  function toggleCoverageInput() {
+    const coverageType = document.querySelector('input[name="fundingCoverageType"]:checked').value;
+    const percentContainer = document.getElementById('coveragePercentContainer');
+    const absoluteContainer = document.getElementById('coverageAbsoluteContainer');
 
     if (coverageType === 'percent') {
-      const fundingOverheadPercent = parseSpaceSeparatedInt(document.getElementById('fundingOverheadPercent').value);
-      const overheadShortfallPercent = Math.max(0, deptOverheadPercent - fundingOverheadPercent);
-      coFinancingRequired = Math.floor((overheadShortfallPercent / 100) * requestedAmount);
+      percentContainer.classList.remove('hidden');
+      absoluteContainer.classList.add('hidden');
     } else {
-      const fundingOverheadAbsolute = parseSpaceSeparatedInt(document.getElementById('fundingOverheadAbsolute').value);
-      const totalOverheadNeeded = Math.floor((deptOverheadPercent / 100) * requestedAmount);
-      const shortfall = totalOverheadNeeded - fundingOverheadAbsolute;
-      coFinancingRequired = shortfall > 0 ? shortfall : 0;
+      percentContainer.classList.add('hidden');
+      absoluteContainer.classList.remove('hidden');
     }
+  }
 
-    // Evaluate "Good" or "Less Attractive"
+  /********************************************************
+   * CALCULATE "DEPARTMENT OVERHEAD NEEDED" AND "COVERAGE USED"
+   *******************************************************/
+  /**
+   * Department overhead needed = (deptOverheadPercent / 100) * requestedAmount
+   */
+  function getDeptOverheadNeeded() {
+    const deptOverheadPercent = parseSpaceSeparatedInt(document.getElementById('deptOverheadPercent').value);
+    const requestedAmount = parseSpaceSeparatedInt(document.getElementById('requestedAmount').value);
+    return Math.floor((deptOverheadPercent / 100) * requestedAmount);
+  }
+
+  /**
+   * Funder overhead portion (if percent or absolute).
+   * coverageOffered = min(funder overhead absolute or % of total, total requested).
+   */
+  function getFunderOverheadOffered() {
+    const requestedAmount = parseSpaceSeparatedInt(document.getElementById('requestedAmount').value);
+    const coverageType = document.querySelector('input[name="fundingCoverageType"]:checked').value;
+
+    let coverageOffered = 0;
+    if (coverageType === 'percent') {
+      const overheadPercent = parseSpaceSeparatedInt(document.getElementById('fundingOverheadPercent').value);
+      coverageOffered = Math.floor((overheadPercent / 100) * requestedAmount);
+    } else {
+      const overheadAbsolute = parseSpaceSeparatedInt(document.getElementById('fundingOverheadAbsolute').value);
+      coverageOffered = Math.min(overheadAbsolute, requestedAmount);
+    }
+    return coverageOffered;
+  }
+
+  /**
+   * coverageUsed = min(deptOverheadNeeded, funderOverheadOffered).
+   * The funder only covers overhead up to the amount needed by the department.
+   */
+  function getCoverageUsed() {
+    const deptOverheadNeeded = getDeptOverheadNeeded();
+    const funderOverheadOffered = getFunderOverheadOffered();
+    return Math.min(deptOverheadNeeded, funderOverheadOffered);
+  }
+
+  /**
+   * leftover for direct costs = requestedAmount - coverageUsed
+   * Because only the portion the funder actually pays for overhead is "lost" from direct costs.
+   * If coverageUsed < deptOverheadNeeded, the rest must be co-financed (but that doesn't affect direct costs from the funder).
+   */
+  function getLeftoverForDirectCosts() {
+    const requestedAmount = parseSpaceSeparatedInt(document.getElementById('requestedAmount').value);
+    const coverageUsed = getCoverageUsed();
+    const leftover = requestedAmount - coverageUsed;
+    return leftover > 0 ? leftover : 0;
+  }
+
+  /**
+   * Update leftover displayed in the UI.
+   */
+  function updateLeftoverDisplay() {
+    const leftover = getLeftoverForDirectCosts();
+    if (leftover <= 0) {
+      document.getElementById('leftoverDisplay').textContent = '0';
+      return;
+    }
+    document.getElementById('leftoverDisplay').textContent = addSpaceThousandSeparators(leftover);
+  }
+
+  /********************************************************
+   * SALARY CLAMPING
+   * existingSalaries <= leftoverForDirectCosts
+   *******************************************************/
+  function formatInputValueAndClamp(inputEl) {
+    formatInputValue(inputEl);
+
+    const leftover = getLeftoverForDirectCosts();
+    let salaryValue = parseSpaceSeparatedInt(inputEl.value);
+    if (salaryValue > leftover) {
+      salaryValue = leftover;
+      inputEl.value = addSpaceThousandSeparators(salaryValue);
+    }
+  }
+
+  /********************************************************
+   * FINAL ATTRACTIVENESS CALCULATION
+   * coFinancingRequired = deptOverheadNeeded - coverageUsed (if positive)
+   * existingSalaries > coFinancingRequired => GOOD
+   *******************************************************/
+  function calculateAttractiveness() {
+    const deptOverheadNeeded = getDeptOverheadNeeded();
+    const coverageUsed = getCoverageUsed();
+    const shortfall = deptOverheadNeeded - coverageUsed;
+    const coFinancingRequired = shortfall > 0 ? shortfall : 0;
+
+    const existingSalaries = parseSpaceSeparatedInt(document.getElementById('existingSalaries').value);
+
+    // Evaluate
     let evaluation, explanation;
     if (existingSalaries > coFinancingRequired) {
       evaluation = 'GOOD';
@@ -251,9 +333,9 @@
       explanation = `The required co-financing (${addSpaceThousandSeparators(coFinancingRequired)}) is more than the amount allocated to existing salaries (${addSpaceThousandSeparators(existingSalaries)}).`;
     }
 
+    // Show final result
     document.getElementById('resultEvaluation').textContent = `${evaluation}`;
     document.getElementById('resultExplanation').textContent = explanation;
-
     document.getElementById('resultContainer').classList.remove('hidden');
   }
 </script>
