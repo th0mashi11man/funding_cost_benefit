@@ -16,7 +16,7 @@
       display: block;
       margin-top: 1em;
     }
-    input, select {
+    input {
       width: 100%;
       padding: 8px;
       margin-top: 0.5em;
@@ -47,6 +47,7 @@
       padding: 10px;
       background: #f9f9f9;
       border: 1px solid #ccc;
+      position: relative;
     }
     #resultEvaluation {
       font-size: 1.2rem;
@@ -56,6 +57,33 @@
     .hidden {
       display: none;
     }
+
+    /* Horizontal Stacked Bar */
+    .bar-container {
+      display: flex;
+      height: 45px;
+      width: 100%;
+      border: 1px solid #ccc;
+      font-size: 0.8rem;
+      color: #fff;
+      overflow: hidden;
+      margin-top: 1em;
+    }
+    .bar-segment {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      text-align: center;
+      white-space: normal;
+      padding: 0 5px;
+    }
+
+    /* Bar color segments in user-specified order: overheadUsed, other, salaries, cofin */
+    .bar-overhead { background-color: #f1c232; } /* gold */
+    .bar-other    { background-color: #93c47d; } /* green */
+    .bar-salary   { background-color: #6fa8dc; } /* blue */
+    .bar-cofin    { background-color: #e06666; } /* red */
   </style>
 </head>
 <body>
@@ -63,280 +91,327 @@
 <h1>Research Funding Financial Attractiveness Calculator</h1>
 
 <div>
-  <!-- 1) Department overhead rate (on total cost) -->
+  <!-- 1) Department Overhead Rate -->
   <label for="deptOverheadPercent">
     1. Department overhead rate (%):
   </label>
   <input
     type="text"
     id="deptOverheadPercent"
-    placeholder="e.g. 25"
-    onblur="formatInputValueAndRecompute(this)"
+    placeholder="e.g. 50"
+    onblur="formatAndUpdateDirect(this)"
   />
 
-  <!-- 2) Total requested amount -->
+  <!-- 2) Total Requested Amount -->
   <label for="requestedAmount">
-    2. Total project budget:
+    2. Total project budget applied for:
   </label>
   <input
     type="text"
     id="requestedAmount"
-    placeholder="e.g. 1 000 000"
-    onblur="formatInputValueAndRecompute(this)"
+    placeholder="e.g. 1,000,000"
+    onblur="formatAndUpdateDirect(this)"
   />
 
-  <!-- 3) Funder overhead coverage type -->
+  <!-- 3) Funder coverage type -->
   <label>
-    3. How is the funder's contribution to indirect costs given?
+    3. How is the funder's coverage of indirect costs given?
   </label>
   <div class="radio-group">
     <label>
       <input
         type="radio"
-        name="fundingCoverageType"
+        name="funderCoverageType"
         value="percent"
         checked
-        onchange="toggleCoverageInput(); updateLeftoverDisplay();"
+        onchange="toggleFunderFields();updateAvailableDirect()"
       />
       Percentage
     </label>
     <label>
       <input
         type="radio"
-        name="fundingCoverageType"
+        name="funderCoverageType"
         value="absolute"
-        onchange="toggleCoverageInput(); updateLeftoverDisplay();"
+        onchange="toggleFunderFields();updateAvailableDirect()"
       />
       Fixed Amount
     </label>
   </div>
 
-  <!-- Overhead coverage as percent -->
-  <div id="coveragePercentContainer">
-    <label for="fundingOverheadPercent">
-      Funder contribution to indirect costs (%):
+  <!-- Funder overhead coverage as percent (cascading) -->
+  <div id="funderPercentContainer">
+    <label for="funderOverheadPercent">
+      Funder indirect cost coverage (%):
     </label>
     <input
       type="text"
-      id="fundingOverheadPercent"
-      placeholder="e.g. 15"
-      onblur="formatInputValueAndRecompute(this)"
+      id="funderOverheadPercent"
+      placeholder="e.g. 20"
+      onblur="formatAndUpdateDirect(this)"
     />
   </div>
 
-  <!-- Overhead coverage as fixed amount -->
-  <div id="coverageAbsoluteContainer" class="hidden">
-    <label for="fundingOverheadAbsolute">
-      Funder contribution to indirect costs (fixed):
+  <!-- Funder overhead coverage as absolute -->
+  <div id="funderAbsoluteContainer" class="hidden">
+    <label for="funderOverheadAbsolute">
+      Funder overhead coverage (absolute):
     </label>
     <input
       type="text"
-      id="fundingOverheadAbsolute"
-      placeholder="e.g. 150 000"
-      onblur="formatInputValueAndRecompute(this)"
+      id="funderOverheadAbsolute"
+      placeholder="e.g. 150000"
+      onblur="formatAndUpdateDirect(this)"
     />
   </div>
 
+  <!-- real-time line showing direct costs right now -->
+  <label>Available funding for direct costs:</label>
+  <p><strong id="availableDirectLine">-</strong></p>
 
-  <!-- 5) Existing salaries (with clamping) -->
+  <!-- 4) Existing salaries (clamped) -->
   <label for="existingSalaries">
-    4. Total amount allocated to cover salaries for existing staff:
+    4. Amount allocated to existing staff salaries:
   </label>
-<!-- 4) Display leftover for direct costs = requested - coverageUsed -->
-  <p class="info-text">
-    Budget remaining for direct costs (including salaries) after contribution to indirect costs:
-    <strong id="leftoverDisplay">-</strong>
-  </p>
   <input
     type="text"
     id="existingSalaries"
-    placeholder="e.g. 600 000"
-    onblur="formatInputValueAndClamp(this)"
+    placeholder="e.g. 600,000"
+    onblur="formatAndClampSalaries(this)"
   />
 
-  <!-- 6) Calculate button -->
-  <button onclick="calculateAttractiveness()">
+  <button onclick="calculateFinal()">
     Calculate financial attractiveness
   </button>
 
   <div class="result hidden" id="resultContainer">
     <div id="resultEvaluation"></div>
     <p id="resultExplanation"></p>
+
+    <!-- Bar: overheadUsed, other, salaries, cofin -->
+    <div class="bar-container hidden" id="barContainer">
+      <div class="bar-segment bar-overhead" id="overheadBar" style="flex:0"></div>
+      <div class="bar-segment bar-other"    id="otherBar"    style="flex:0"></div>
+      <div class="bar-segment bar-salary"   id="salaryBar"   style="flex:0"></div>
+      <div class="bar-segment bar-cofin"    id="cofinBar"    style="flex:0"></div>
+    </div>
   </div>
 </div>
 
 <script>
-  /********************************************************
-   * HELPER FUNCTIONS
-   *******************************************************/
-  /**
-   * Insert spaces as thousand separators in an integer.
-   * Example: 1000000 -> "1 000 000"
-   */
-  function addSpaceThousandSeparators(num) {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-  }
-
-  /**
-   * Parse a string with space thousand separators back to an integer.
-   */
-  function parseSpaceSeparatedInt(str) {
-    if (!str) return 0;
-    const cleaned = str.replace(/\s+/g, '');
-    const val = parseInt(cleaned, 10);
-    return isNaN(val) ? 0 : val;
-  }
-
-  /**
-   * Remove all non-digit characters, parse as integer,
-   * then reformat with spaces as thousand separators.
-   */
-  function formatInputValue(inputEl) {
-    const raw = inputEl.value.replace(/[^\d]/g, '');
+  /*********************************
+   * 1) PARSING & FORMATTING
+   *********************************/
+  function formatInputValue(el) {
+    const raw = el.value.replace(/[^\d]/g, '');
     if (!raw) {
-      inputEl.value = '';
+      el.value = '';
       return;
     }
-    const number = parseInt(raw, 10);
-    if (isNaN(number)) {
-      inputEl.value = '';
+    const num = parseInt(raw, 10);
+    if (isNaN(num)) {
+      el.value = '';
       return;
     }
-    inputEl.value = addSpaceThousandSeparators(number);
+    el.value = num.toLocaleString();
   }
 
-  /**
-   * On blur, format the field and then update leftover if needed.
-   */
-  function formatInputValueAndRecompute(inputEl) {
-    formatInputValue(inputEl);
-    updateLeftoverDisplay();
+  function parseIntFromString(str) {
+    if (!str) return 0;
+    const cleaned = str.replace(/[^\d]/g, '');
+    return parseInt(cleaned, 10) || 0;
   }
 
-  /**
-   * Show/hide overhead coverage input (percent vs. absolute).
-   */
-  function toggleCoverageInput() {
-    const coverageType = document.querySelector('input[name="fundingCoverageType"]:checked').value;
-    const percentContainer = document.getElementById('coveragePercentContainer');
-    const absoluteContainer = document.getElementById('coverageAbsoluteContainer');
+  function formatAndUpdateDirect(el) {
+    formatInputValue(el);
+    updateAvailableDirect();
+  }
 
+  /*********************************
+   * 2) TOGGLE FUNDER FIELDS
+   *********************************/
+  function toggleFunderFields() {
+    const coverageType = document.querySelector('input[name="funderCoverageType"]:checked').value;
+    const percentDiv  = document.getElementById('funderPercentContainer');
+    const absoluteDiv = document.getElementById('funderAbsoluteContainer');
     if (coverageType === 'percent') {
-      percentContainer.classList.remove('hidden');
-      absoluteContainer.classList.add('hidden');
+      percentDiv.classList.remove('hidden');
+      absoluteDiv.classList.add('hidden');
     } else {
-      percentContainer.classList.add('hidden');
-      absoluteContainer.classList.remove('hidden');
+      percentDiv.classList.add('hidden');
+      absoluteDiv.classList.remove('hidden');
     }
   }
+  document.querySelectorAll('input[name="funderCoverageType"]').forEach(radio => {
+    radio.addEventListener('change', toggleFunderFields);
+  });
+  toggleFunderFields();
 
-  /********************************************************
-   * CALCULATE "DEPARTMENT OVERHEAD NEEDED" AND "COVERAGE USED"
-   *******************************************************/
-  /**
-   * Department overhead needed = (deptOverheadPercent / 100) * requestedAmount
-   */
-  function getDeptOverheadNeeded() {
-    const deptOverheadPercent = parseSpaceSeparatedInt(document.getElementById('deptOverheadPercent').value);
-    const requestedAmount = parseSpaceSeparatedInt(document.getElementById('requestedAmount').value);
-    return Math.floor((deptOverheadPercent / 100) * requestedAmount);
+  /*********************************
+   * 3) CASCADING Overhead
+   * overhead = totalGrant * ( rDecimal / (1 + rDecimal))
+   *********************************/
+  function getCascadingOverhead(total, overheadPercent) {
+    if (overheadPercent <= 0) return 0;
+    const dec = overheadPercent / 100;
+    return Math.round(total * (dec / (1 + dec)));
   }
 
-  /**
-   * Funder overhead portion (if percent or absolute).
-   * coverageOffered = min(funder overhead absolute or % of total, total requested).
-   */
-  function getFunderOverheadOffered() {
-    const requestedAmount = parseSpaceSeparatedInt(document.getElementById('requestedAmount').value);
-    const coverageType = document.querySelector('input[name="fundingCoverageType"]:checked').value;
+  /*********************************
+   * 4) DEPARTMENT Overhead
+   *********************************/
+  function getDeptOverhead(totalRequested, deptOverheadPercent) {
+    return getCascadingOverhead(totalRequested, deptOverheadPercent);
+  }
 
-    let coverageOffered = 0;
+  /*********************************
+   * 5) FUNDER Overhead (Cascading If %)
+   *********************************/
+  function getFunderOverhead(totalRequested) {
+    const coverageType = document.querySelector('input[name="funderCoverageType"]:checked').value;
     if (coverageType === 'percent') {
-      const overheadPercent = parseSpaceSeparatedInt(document.getElementById('fundingOverheadPercent').value);
-      coverageOffered = Math.floor((overheadPercent / 100) * requestedAmount);
+      const funderPercent = parseIntFromString(document.getElementById('funderOverheadPercent').value) || 0;
+      return getCascadingOverhead(totalRequested, funderPercent);
     } else {
-      const overheadAbsolute = parseSpaceSeparatedInt(document.getElementById('fundingOverheadAbsolute').value);
-      coverageOffered = Math.min(overheadAbsolute, requestedAmount);
-    }
-    return coverageOffered;
-  }
-
-  /**
-   * coverageUsed = min(deptOverheadNeeded, funderOverheadOffered).
-   * The funder only covers overhead up to the amount needed by the department.
-   */
-  function getCoverageUsed() {
-    const deptOverheadNeeded = getDeptOverheadNeeded();
-    const funderOverheadOffered = getFunderOverheadOffered();
-    return Math.min(deptOverheadNeeded, funderOverheadOffered);
-  }
-
-  /**
-   * leftover for direct costs = requestedAmount - coverageUsed
-   * Because only the portion the funder actually pays for overhead is "lost" from direct costs.
-   * If coverageUsed < deptOverheadNeeded, the rest must be co-financed (but that doesn't affect direct costs from the funder).
-   */
-  function getLeftoverForDirectCosts() {
-    const requestedAmount = parseSpaceSeparatedInt(document.getElementById('requestedAmount').value);
-    const coverageUsed = getCoverageUsed();
-    const leftover = requestedAmount - coverageUsed;
-    return leftover > 0 ? leftover : 0;
-  }
-
-  /**
-   * Update leftover displayed in the UI.
-   */
-  function updateLeftoverDisplay() {
-    const leftover = getLeftoverForDirectCosts();
-    if (leftover <= 0) {
-      document.getElementById('leftoverDisplay').textContent = '0';
-      return;
-    }
-    document.getElementById('leftoverDisplay').textContent = addSpaceThousandSeparators(leftover);
-  }
-
-  /********************************************************
-   * SALARY CLAMPING
-   * existingSalaries <= leftoverForDirectCosts
-   *******************************************************/
-  function formatInputValueAndClamp(inputEl) {
-    formatInputValue(inputEl);
-
-    const leftover = getLeftoverForDirectCosts();
-    let salaryValue = parseSpaceSeparatedInt(inputEl.value);
-    if (salaryValue > leftover) {
-      salaryValue = leftover;
-      inputEl.value = addSpaceThousandSeparators(salaryValue);
+      // absolute
+      const abs = parseIntFromString(document.getElementById('funderOverheadAbsolute').value) || 0;
+      if (abs < 0) return 0;
+      if (abs > totalRequested) return totalRequested;
+      return abs;
     }
   }
 
-  /********************************************************
-   * FINAL ATTRACTIVENESS CALCULATION
-   * coFinancingRequired = deptOverheadNeeded - coverageUsed (if positive)
-   * existingSalaries > coFinancingRequired => GOOD
-   *******************************************************/
-  function calculateAttractiveness() {
-    const deptOverheadNeeded = getDeptOverheadNeeded();
-    const coverageUsed = getCoverageUsed();
-    const shortfall = deptOverheadNeeded - coverageUsed;
-    const coFinancingRequired = shortfall > 0 ? shortfall : 0;
+  /*********************************
+   * 6) Real-Time Direct
+   * If funder coverage = 0 => direct = requested
+   * else => direct = requested - coverageUsed
+   * coverageUsed = min(deptOverhead, funderOverhead)
+   *********************************/
+  function computeAvailableDirect() {
+    const deptOverP  = parseIntFromString(document.getElementById('deptOverheadPercent').value) || 0;
+    const requested  = parseIntFromString(document.getElementById('requestedAmount').value) || 0;
+    if (requested <= 0) return 0;
 
-    const existingSalaries = parseSpaceSeparatedInt(document.getElementById('existingSalaries').value);
+    // dept overhead (cascading)
+    const deptOverhead = getDeptOverhead(requested, deptOverP);
+
+    // funder overhead coverage (cascading if %)
+    const funderCoverage = getFunderOverhead(requested);
+
+    if (funderCoverage <= 0) {
+      // entire requested is direct
+      return requested;
+    }
+    const coverageUsed = Math.min(deptOverhead, funderCoverage);
+    const direct = requested - coverageUsed;
+    return direct < 0 ? 0 : direct;
+  }
+
+  function updateAvailableDirect() {
+    const direct = computeAvailableDirect();
+    document.getElementById('availableDirectLine').textContent = direct.toLocaleString();
+  }
+
+  /*********************************
+   * 7) SALARY CLAMP
+   *********************************/
+  function formatAndClampSalaries(el) {
+    formatInputValue(el);
+    const direct = computeAvailableDirect();
+    let typed = parseIntFromString(el.value) || 0;
+    if (typed > direct) {
+      typed = direct;
+      el.value = typed.toLocaleString();
+    }
+  }
+
+  /*********************************
+   * 8) FINAL CALC
+   *********************************/
+  function calculateFinal() {
+    // parse inputs
+    const deptOverP = parseIntFromString(document.getElementById('deptOverheadPercent').value) || 0;
+    const requested = parseIntFromString(document.getElementById('requestedAmount').value) || 0;
+    let userSalaries = parseIntFromString(document.getElementById('existingSalaries').value) || 0;
+
+    // 1) department overhead (cascading)
+    const deptOverhead = getDeptOverhead(requested, deptOverP);
+
+    // 2) funder overhead coverage (cascading if %)
+    const funderCoverage = getFunderOverhead(requested);
+
+    // 3) if coverage=0 => entire requested is direct
+    //    else direct = requested - coverageUsed
+    let coverageUsed = 0;
+    let finalDirect  = 0;
+    let coFin        = deptOverhead; // if coverage=0 => coFin=deptOverhead
+    if (funderCoverage <= 0) {
+      finalDirect = requested;
+      coverageUsed = 0;
+      coFin = deptOverhead;
+    } else {
+      coverageUsed = Math.min(deptOverhead, funderCoverage);
+      finalDirect  = requested - coverageUsed;
+      if (finalDirect < 0) finalDirect = 0;
+      coFin = deptOverhead - coverageUsed;
+      if (coFin < 0) coFin = 0;
+    }
+
+    // clamp user salaries again
+    if (userSalaries > finalDirect) {
+      userSalaries = finalDirect;
+      document.getElementById('existingSalaries').value = userSalaries.toLocaleString();
+    }
+
+    // other = finalDirect - userSalaries
+    let other = finalDirect - userSalaries;
+    if (other < 0) other = 0;
 
     // Evaluate
     let evaluation, explanation;
-    if (existingSalaries > coFinancingRequired) {
+    if (userSalaries > coFin) {
       evaluation = 'GOOD';
-      explanation = `The amount allocated to existing salaries (${addSpaceThousandSeparators(existingSalaries)}) is greater than the required co-financing (${addSpaceThousandSeparators(coFinancingRequired)}).`;
+      explanation = `The grant provides for more in salary costs for existing staff (${userSalaries.toLocaleString()}) than it costs in co-financing (${coFin.toLocaleString()}).`;
     } else {
       evaluation = 'LESS ATTRACTIVE';
-      explanation = `The required co-financing (${addSpaceThousandSeparators(coFinancingRequired)}) is more than the amount allocated to existing salaries (${addSpaceThousandSeparators(existingSalaries)}).`;
+      explanation = `The grant costs more in co-financing (${coFin.toLocaleString()}) than it provides in salary costs for existing staff (${userSalaries.toLocaleString()}).`;
     }
 
-    // Show final result
-    document.getElementById('resultEvaluation').textContent = `${evaluation}`;
+    // show textual
+    document.getElementById('resultEvaluation').textContent = evaluation;
     document.getElementById('resultExplanation').textContent = explanation;
     document.getElementById('resultContainer').classList.remove('hidden');
+
+    // bar
+    const sumSeg = coverageUsed + other + userSalaries + coFin;
+    const barContainer = document.getElementById('barContainer');
+    if (sumSeg <= 0) {
+      barContainer.classList.add('hidden');
+      return;
+    }
+    barContainer.classList.remove('hidden');
+
+    function fraction(x) {
+      return (sumSeg > 0 && x > 0) ? x / sumSeg : 0;
+    }
+    const overheadFrac = fraction(coverageUsed);
+    const otherFrac    = fraction(other);
+    const salaryFrac   = fraction(userSalaries);
+    const cofinFrac    = fraction(coFin);
+
+    document.getElementById('overheadBar').style.flex = overheadFrac.toString();
+    document.getElementById('otherBar').style.flex    = otherFrac.toString();
+    document.getElementById('salaryBar').style.flex   = salaryFrac.toString();
+    document.getElementById('cofinBar').style.flex    = cofinFrac.toString();
+
+    function label2Lines(lbl, val) {
+      if (val <= 0) return '';
+      return `${lbl}<br>${val.toLocaleString()}`;
+    }
+    document.getElementById('overheadBar').innerHTML = label2Lines('Indirect', coverageUsed);
+    document.getElementById('otherBar').innerHTML    = label2Lines('Other costs', other);
+    document.getElementById('salaryBar').innerHTML   = label2Lines('Ex. salaries', userSalaries);
+    document.getElementById('cofinBar').innerHTML    = label2Lines('Co-finance', coFin);
   }
 </script>
 
