@@ -1,419 +1,322 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>External Research Funding Financial Cost-benefit Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Research Funding Financial Cost-Benefit Calculator</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 30px;
-      max-width: 600px;
+    :root{
+      --bg:#0b1020; --panel:#11192f; --muted:#9fb0c7; --text:#e6eef7;
+      --accent:#7bbfff; --ok:#5bd69f; --warn:#ffd166; --bad:#ff6b6b;
+      --gold:#f1c232; --green:#93c47d; --blue:#6fa8dc; --red:#e06666;
+      --border:rgba(255,255,255,0.08);
     }
-    h1 {
-      margin-bottom: 10px;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      margin:0; color:var(--text); background:linear-gradient(180deg,#0b1020 0%, #0e1430 100%);
     }
-    label {
-      display: block;
-      margin-top: 1em;
-    }
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-top: 0.5em;
-      box-sizing: border-box;
-    }
-    .radio-group {
-      display: flex;
-      gap: 1em;
-      margin-top: 0.5em;
-    }
-    .radio-group input {
-      width: auto;
-      margin-top: 0.2em;
-    }
-    button {
-      margin-top: 1.5em;
-      padding: 10px;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-    .info-text {
-      margin-top: 0.5em;
-      font-style: italic;
-      color: #555;
-    }
-    .result {
-      margin-top: 2em;
-      padding: 10px;
-      background: #f9f9f9;
-      border: 1px solid #ccc;
-      position: relative;
-    }
-    #resultEvaluation {
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-bottom: 0.5em;
-    }
-    .hidden {
-      display: none;
-    }
+    .wrap{max-width:920px; margin:32px auto; padding:24px;}
+    h1{margin:0 0 6px; font-size:clamp(1.2rem,2.4vw,1.6rem)}
 
-    /* Horizontal Stacked Bar */
-    .bar-container {
-      display: flex;
-      height: 45px;
-      width: 100%;
-      border: 1px solid #ccc;
-      font-size: 0.8rem;
-      color: #fff;
-      overflow: hidden;
-      margin-top: 1em;
-    }
-    .bar-segment {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      text-align: center;
-      white-space: normal;
-      padding: 0 5px;
-    }
+    .card{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:18px 18px 6px; box-shadow:0 10px 30px rgba(0,0,0,0.25)}
+    .grid{display:grid; gap:14px; grid-template-columns:repeat(12,1fr)}
+    .col-12{grid-column:span 12}
+    @media (min-width:720px){.col-6{grid-column:span 6}}
 
-    /* Bar color segments in user-specified order: overheadUsed, other, salaries, cofin */
-    .bar-overhead { background-color: #f1c232; } /* gold */
-    .bar-other    { background-color: #93c47d; } /* green */
-    .bar-salary   { background-color: #6fa8dc; } /* blue */
-    .bar-cofin    { background-color: #e06666; } /* red */
+    label{display:block; font-weight:600; margin:8px 0 6px}
+    input[type="text"], input[type="number"], select{width:100%; background:#0b1330; color:var(--text); border:1px solid var(--border); border-radius:10px; padding:10px 12px; font-size:1rem}
+    .row{display:flex; gap:10px; align-items:center}
+    .radio-group{display:flex; gap:14px; margin-top:6px}
+    .radio{display:flex; gap:8px; align-items:center}
+
+    button{background:var(--accent); color:#071225; font-weight:700; border:none; border-radius:12px; padding:12px 16px; cursor:pointer; font-size:1rem; margin-top:8px}
+    button.secondary{background:transparent; color:var(--muted); border:1px solid var(--border)}
+
+    .result{margin-top:18px; background:#0d1538; border:1px solid var(--border); padding:16px; border-radius:12px; position:relative}
+    .tag{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; font-weight:700; letter-spacing:.2px}
+    .ok{background:rgba(91,214,159,.12); color:var(--ok); border:1px solid rgba(91,214,159,.25)}
+    .bad{background:rgba(255,107,107,.12); color:var(--bad); border:1px solid rgba(255,107,107,.25)}
+    .warn{background:rgba(255,209,102,.12); color:var(--warn); border:1px solid rgba(255,209,102,.25)}
+
+    .bar-container{display:flex; height:48px; width:100%; border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-top:12px}
+    .bar-segment{display:flex; align-items:center; justify-content:center; font-weight:800; text-align:center; white-space:normal; padding:0 6px; font-size:.85rem; text-shadow:0 1px 2px rgba(0,0,0,.28)}
+    .bar-overhead{background:var(--gold)}
+    .bar-other{background:var(--green)}
+    .bar-salary{background:var(--blue)}
+    .bar-cofin{background:var(--red)}
+
+    .hidden{display:none}
+    .row-end{display:flex; gap:10px; justify-content:flex-end; margin-top:8px}
+    .legend{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px}
+    .legend .chip{display:inline-flex; gap:8px; align-items:center; padding:4px 8px; border-radius:999px; border:1px solid var(--border); background:#0b1330; color:var(--muted); font-size:.85rem}
+    .dot{width:10px; height:10px; border-radius:50%}
+    .dot.o{background:var(--gold)} .dot.oth{background:var(--green)} .dot.s{background:var(--blue)} .dot.c{background:var(--red)}
+
+    .inline-mono{font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+    .help{font-size:.9rem; color:var(--muted)}
+    .err{color:var(--bad); font-size:.9rem}
   </style>
 </head>
 <body>
+  <div class="wrap">
+    <h1>Research Funding Financial Cost-Benefit Calculator</h1>
 
-<h1>Research Funding Financial Attractiveness Calculator</h1>
+    <div class="card">
+      <div class="grid">
+        <div class="col-6">
+          <label for="deptOverheadPercent">1) Overhead rate (%)</label>
+          <input id="deptOverheadPercent" inputmode="decimal" placeholder="e.g., 50" />
+        </div>
+        <div class="col-6">
+          <label for="requestedAmount">2) Total project budget applied for</label>
+          <input id="requestedAmount" inputmode="numeric" placeholder="e.g., 1,000,000" />
+        </div>
 
-<div>
-  <!-- 1) Department Overhead Rate -->
-  <label for="deptOverheadPercent">
-    1. Department overhead rate (%):
-  </label>
-  <input
-    type="text"
-    id="deptOverheadPercent"
-    placeholder="e.g. 50"
-    onblur="formatAndUpdateDirect(this)"
-  />
+        <div class="col-12">
+          <label>3) How is the funder's coverage of indirect costs given? <span class="help">(if the funder doesn’t cover any indirect costs, put 0)</span></label>
+          <div class="radio-group" role="radiogroup" aria-label="Funder coverage type">
+            <label class="radio"><input type="radio" name="funderCoverageType" value="percent" checked /> Percentage</label>
+            <label class="radio"><input type="radio" name="funderCoverageType" value="absolute" /> Fixed amount</label>
+          </div>
+        </div>
 
-  <!-- 2) Total Requested Amount -->
-  <label for="requestedAmount">
-    2. Total project budget applied for:
-  </label>
-  <input
-    type="text"
-    id="requestedAmount"
-    placeholder="e.g. 1,000,000"
-    onblur="formatAndUpdateDirect(this)"
-  />
+        <div class="col-6" id="funderPercentContainer">
+          <label for="funderOverheadPercent">Funder indirect cost coverage (%)</label>
+          <input id="funderOverheadPercent" inputmode="decimal" placeholder="e.g., 20" />
+        </div>
+        <div class="col-6 hidden" id="funderAbsoluteContainer">
+          <label for="funderOverheadAbsolute">Funder overhead coverage (absolute)</label>
+          <input id="funderOverheadAbsolute" inputmode="numeric" placeholder="e.g., 150000" />
+        </div>
 
-  <!-- 3) Funder coverage type -->
-  <label>
-    3. How is the funder's coverage of indirect costs given?
-  </label>
-  <div class="radio-group">
-    <label>
-      <input
-        type="radio"
-        name="funderCoverageType"
-        value="percent"
-        checked
-        onchange="toggleFunderFields();updateAvailableDirect()"
-      />
-      Percentage
-    </label>
-    <label>
-      <input
-        type="radio"
-        name="funderCoverageType"
-        value="absolute"
-        onchange="toggleFunderFields();updateAvailableDirect()"
-      />
-      Fixed Amount
-    </label>
-  </div>
+        <div class="col-12">
+          <label>Available funding for direct costs:</label>
+          <div><strong id="availableDirectLine" class="inline-mono">–</strong></div>
+          <div id="directWarn" class="err hidden">Enter requested amount and overheads to compute direct costs.</div>
+        </div>
 
-  <!-- Funder overhead coverage as percent (cascading) -->
-  <div id="funderPercentContainer">
-    <label for="funderOverheadPercent">
-      Funder indirect cost coverage (%):
-    </label>
-    <input
-      type="text"
-      id="funderOverheadPercent"
-      placeholder="e.g. 20"
-      onblur="formatAndUpdateDirect(this)"
-    />
-  </div>
+        <div class="col-12">
+          <label for="existingSalaries">4) Amount allocated to existing staff salaries</label>
+          <input id="existingSalaries" inputmode="numeric" placeholder="e.g., 600,000" />
+        </div>
+      </div>
 
-  <!-- Funder overhead coverage as absolute -->
-  <div id="funderAbsoluteContainer" class="hidden">
-    <label for="funderOverheadAbsolute">
-      Funder overhead coverage (absolute):
-    </label>
-    <input
-      type="text"
-      id="funderOverheadAbsolute"
-      placeholder="e.g. 150000"
-      onblur="formatAndUpdateDirect(this)"
-    />
-  </div>
+      <div class="row-end">
+        <button id="calcBtn" aria-label="Calculate financial attractiveness">Calculate</button>
+        <button id="resetBtn" class="secondary" aria-label="Reset inputs">Reset</button>
+      </div>
 
-  <!-- real-time line showing direct costs right now -->
-  <label>Available funding for direct costs:</label>
-  <p><strong id="availableDirectLine">-</strong></p>
+      <div class="result hidden" id="resultContainer" aria-live="polite">
+        <div id="resultTag" class="tag warn">Result pending…</div>
+        <p id="resultExplanation" class="help" style="margin-top:10px"></p>
 
-  <!-- 4) Existing salaries (clamped) -->
-  <label for="existingSalaries">
-    4. Amount allocated to existing staff salaries:
-  </label>
-  <input
-    type="text"
-    id="existingSalaries"
-    placeholder="e.g. 600,000"
-    onblur="formatAndClampSalaries(this)"
-  />
+        <div class="bar-container hidden" id="barContainer">
+          <div class="bar-segment bar-overhead" id="overheadBar" style="flex:0"></div>
+          <div class="bar-segment bar-other"    id="otherBar"    style="flex:0"></div>
+          <div class="bar-segment bar-salary"   id="salaryBar"   style="flex:0"></div>
+          <div class="bar-segment bar-cofin"    id="cofinBar"    style="flex:0"></div>
+        </div>
+        <div class="legend">
+          <span class="chip"><span class="dot o"></span>Indirect covered</span>
+          <span class="chip"><span class="dot oth"></span>Other direct</span>
+          <span class="chip"><span class="dot s"></span>Existing salaries</span>
+          <span class="chip"><span class="dot c"></span>Co-finance</span>
+        </div>
 
-  <button onclick="calculateFinal()">
-    Calculate financial attractiveness
-  </button>
-
-  <div class="result hidden" id="resultContainer">
-    <div id="resultEvaluation"></div>
-    <p id="resultExplanation"></p>
-
-    <!-- Bar: overheadUsed, other, salaries, cofin -->
-    <div class="bar-container hidden" id="barContainer">
-      <div class="bar-segment bar-overhead" id="overheadBar" style="flex:0"></div>
-      <div class="bar-segment bar-other"    id="otherBar"    style="flex:0"></div>
-      <div class="bar-segment bar-salary"   id="salaryBar"   style="flex:0"></div>
-      <div class="bar-segment bar-cofin"    id="cofinBar"    style="flex:0"></div>
+        <details style="margin-top:12px">
+          <summary>Calculation details (click to expand)</summary>
+          <div id="numbersDump" class="inline-mono" style="margin-top:8px"></div>
+        </details>
+      </div>
     </div>
   </div>
-</div>
 
 <script>
-  /*********************************
-   * 1) PARSING & FORMATTING
-   *********************************/
-  function formatInputValue(el) {
-    const raw = el.value.replace(/[^\d]/g, '');
-    if (!raw) {
-      el.value = '';
-      return;
-    }
-    const num = parseInt(raw, 10);
-    if (isNaN(num)) {
-      el.value = '';
-      return;
-    }
-    el.value = num.toLocaleString();
-  }
-
-  function parseIntFromString(str) {
+  // ---------- Utilities ----------
+  const el = id => document.getElementById(id);
+  const fmt = n => (isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:0}) : '–');
+  const cleanNum = (str) => {
     if (!str) return 0;
-    const cleaned = str.replace(/[^\d]/g, '');
-    return parseInt(cleaned, 10) || 0;
-  }
-
-  function formatAndUpdateDirect(el) {
-    formatInputValue(el);
-    updateAvailableDirect();
-  }
-
-  /*********************************
-   * 2) TOGGLE FUNDER FIELDS
-   *********************************/
-  function toggleFunderFields() {
-    const coverageType = document.querySelector('input[name="funderCoverageType"]:checked').value;
-    const percentDiv  = document.getElementById('funderPercentContainer');
-    const absoluteDiv = document.getElementById('funderAbsoluteContainer');
-    if (coverageType === 'percent') {
-      percentDiv.classList.remove('hidden');
-      absoluteDiv.classList.add('hidden');
-    } else {
-      percentDiv.classList.add('hidden');
-      absoluteDiv.classList.remove('hidden');
+    const s = String(str).replace(/[^\d.,\s]/g,'').replace(/\s+/g,'');
+    const lastComma = s.lastIndexOf(',');
+    const lastDot   = s.lastIndexOf('.');
+    let decIdx = Math.max(lastComma, lastDot);
+    if (decIdx >= 0) {
+      const intPart = s.slice(0, decIdx).replace(/[.,]/g,'');
+      const decPart = s.slice(decIdx+1).replace(/[.,]/g,'');
+      return Number(intPart + '.' + decPart) || 0;
     }
-  }
-  document.querySelectorAll('input[name="funderCoverageType"]').forEach(radio => {
-    radio.addEventListener('change', toggleFunderFields);
-  });
-  toggleFunderFields();
+    return Number(s.replace(/[.,]/g,'')) || 0;
+  };
+  const clamp = (x,min,max) => Math.max(min, Math.min(x, max));
 
-  /*********************************
-   * 3) CASCADING Overhead
-   * overhead = totalGrant * ( rDecimal / (1 + rDecimal))
-   *********************************/
-  function getCascadingOverhead(total, overheadPercent) {
-    if (overheadPercent <= 0) return 0;
-    const dec = overheadPercent / 100;
-    return Math.round(total * (dec / (1 + dec)));
-  }
+  // ---------- Elements ----------
+  const deptOverheadPercent = el('deptOverheadPercent');
+  const requestedAmount     = el('requestedAmount');
+  const funderTypeRadios    = document.querySelectorAll('input[name="funderCoverageType"]');
+  const funderPercent       = el('funderOverheadPercent');
+  const funderAbsolute      = el('funderOverheadAbsolute');
+  const funderPercentBox    = el('funderPercentContainer');
+  const funderAbsoluteBox   = el('funderAbsoluteContainer');
+  const availableDirectLine = el('availableDirectLine');
+  const directWarn          = el('directWarn');
+  const existingSalaries    = el('existingSalaries');
+  const resultContainer     = el('resultContainer');
+  const resultTag           = el('resultTag');
+  const resultExplanation   = el('resultExplanation');
+  const barContainer        = el('barContainer');
+  const bars = {
+    overhead: el('overheadBar'), other: el('otherBar'), salary: el('salaryBar'), cofin: el('cofinBar')
+  };
+  const numbersDump         = el('numbersDump');
 
-  /*********************************
-   * 4) DEPARTMENT Overhead
-   *********************************/
-  function getDeptOverhead(totalRequested, deptOverheadPercent) {
-    return getCascadingOverhead(totalRequested, deptOverheadPercent);
-  }
-
-  /*********************************
-   * 5) FUNDER Overhead (Cascading If %)
-   *********************************/
-  function getFunderOverhead(totalRequested) {
-    const coverageType = document.querySelector('input[name="funderCoverageType"]:checked').value;
-    if (coverageType === 'percent') {
-      const funderPercent = parseIntFromString(document.getElementById('funderOverheadPercent').value) || 0;
-      return getCascadingOverhead(totalRequested, funderPercent);
-    } else {
-      // absolute
-      const abs = parseIntFromString(document.getElementById('funderOverheadAbsolute').value) || 0;
-      if (abs < 0) return 0;
-      if (abs > totalRequested) return totalRequested;
-      return abs;
-    }
+  // ---------- Logic ----------
+  function getCascadingOverhead(total, percent){
+    const p = Math.max(0, cleanNum(percent));
+    if (p <= 0 || total <= 0) return 0;
+    const r = p/100;
+    return Math.round(total * (r/(1+r)));
   }
 
-  /*********************************
-   * 6) Real-Time Direct
-   * If funder coverage = 0 => direct = requested
-   * else => direct = requested - coverageUsed
-   * coverageUsed = min(deptOverhead, funderOverhead)
-   *********************************/
-  function computeAvailableDirect() {
-    const deptOverP  = parseIntFromString(document.getElementById('deptOverheadPercent').value) || 0;
-    const requested  = parseIntFromString(document.getElementById('requestedAmount').value) || 0;
-    if (requested <= 0) return 0;
-
-    // dept overhead (cascading)
-    const deptOverhead = getDeptOverhead(requested, deptOverP);
-
-    // funder overhead coverage (cascading if %)
-    const funderCoverage = getFunderOverhead(requested);
-
-    if (funderCoverage <= 0) {
-      // entire requested is direct
-      return requested;
-    }
-    const coverageUsed = Math.min(deptOverhead, funderCoverage);
-    const direct = requested - coverageUsed;
-    return direct < 0 ? 0 : direct;
+  function getDeptOverhead(total){
+    return getCascadingOverhead(total, deptOverheadPercent.value);
   }
 
-  function updateAvailableDirect() {
+  function getFunderOverhead(total){
+    const type = [...funderTypeRadios].find(r=>r.checked)?.value || 'percent';
+    if (type === 'percent') return getCascadingOverhead(total, funderPercent.value);
+    const abs = Math.round(cleanNum(funderAbsolute.value));
+    return clamp(abs, 0, Math.max(0,total));
+  }
+
+  function computeAvailableDirect(){
+    const total = Math.round(cleanNum(requestedAmount.value));
+    if (total <= 0) return 0;
+    const dept = getDeptOverhead(total);
+    const fund = getFunderOverhead(total);
+    if (fund <= 0) return total; // all direct
+    const used = Math.min(dept, fund);
+    return Math.max(0, total - used);
+  }
+
+  function updateAvailableDirect(){
     const direct = computeAvailableDirect();
-    document.getElementById('availableDirectLine').textContent = direct.toLocaleString();
+    availableDirectLine.textContent = fmt(direct);
+    directWarn.classList.toggle('hidden', direct > 0);
+    const sal = Math.round(cleanNum(existingSalaries.value));
+    if (sal > direct) existingSalaries.value = fmt(direct);
   }
 
-  /*********************************
-   * 7) SALARY CLAMP
-   *********************************/
-  function formatAndClampSalaries(el) {
-    formatInputValue(el);
-    const direct = computeAvailableDirect();
-    let typed = parseIntFromString(el.value) || 0;
-    if (typed > direct) {
-      typed = direct;
-      el.value = typed.toLocaleString();
-    }
+  function toggleFunderFields(){
+    const type = [...funderTypeRadios].find(r=>r.checked)?.value || 'percent';
+    funderPercentBox.classList.toggle('hidden', type !== 'percent');
+    funderAbsoluteBox.classList.toggle('hidden', type !== 'absolute');
   }
 
-  /*********************************
-   * 8) FINAL CALC
-   *********************************/
-  function calculateFinal() {
-    // parse inputs
-    const deptOverP = parseIntFromString(document.getElementById('deptOverheadPercent').value) || 0;
-    const requested = parseIntFromString(document.getElementById('requestedAmount').value) || 0;
-    let userSalaries = parseIntFromString(document.getElementById('existingSalaries').value) || 0;
+  function label2Lines(lbl, val){
+    return val > 0 ? `${lbl}<br>${fmt(val)}` : '';
+  }
 
-    // 1) department overhead (cascading)
-    const deptOverhead = getDeptOverhead(requested, deptOverP);
+  function calculate(){
+    const total = Math.round(cleanNum(requestedAmount.value));
+    const deptP = cleanNum(deptOverheadPercent.value);
 
-    // 2) funder overhead coverage (cascading if %)
-    const funderCoverage = getFunderOverhead(requested);
+    const deptOver   = getDeptOverhead(total);
+    const fundOver   = getFunderOverhead(total);
 
-    // 3) if coverage=0 => entire requested is direct
-    //    else direct = requested - coverageUsed
-    let coverageUsed = 0;
-    let finalDirect  = 0;
-    let coFin        = deptOverhead; // if coverage=0 => coFin=deptOverhead
-    if (funderCoverage <= 0) {
-      finalDirect = requested;
+    let coverageUsed = 0, finalDirect = 0, coFin = deptOver;
+    if (fundOver <= 0){
+      finalDirect = total;
       coverageUsed = 0;
-      coFin = deptOverhead;
+      coFin = deptOver;
     } else {
-      coverageUsed = Math.min(deptOverhead, funderCoverage);
-      finalDirect  = requested - coverageUsed;
-      if (finalDirect < 0) finalDirect = 0;
-      coFin = deptOverhead - coverageUsed;
-      if (coFin < 0) coFin = 0;
+      coverageUsed = Math.min(deptOver, fundOver);
+      finalDirect  = Math.max(0, total - coverageUsed);
+      coFin        = Math.max(0, deptOver - coverageUsed);
     }
 
-    // clamp user salaries again
-    if (userSalaries > finalDirect) {
-      userSalaries = finalDirect;
-      document.getElementById('existingSalaries').value = userSalaries.toLocaleString();
+    let userSalaries = Math.round(cleanNum(existingSalaries.value));
+    userSalaries = clamp(userSalaries, 0, finalDirect);
+    if (userSalaries !== Math.round(cleanNum(existingSalaries.value))){
+      existingSalaries.value = fmt(userSalaries);
     }
 
-    // other = finalDirect - userSalaries
-    let other = finalDirect - userSalaries;
-    if (other < 0) other = 0;
+    let other = Math.max(0, finalDirect - userSalaries);
 
-    // Evaluate
-    let evaluation, explanation;
-    if (userSalaries > coFin) {
-      evaluation = 'CLEAR cost-benefit advantage';
-      explanation = `The grant provides for more in salary costs for existing staff (${userSalaries.toLocaleString()}) than it costs in co-financing (${coFin.toLocaleString()}).`;
-    } else {
-      evaluation = 'UNCLEAR cost-benefit advantage';
-      explanation = `The grant costs more in co-financing (${coFin.toLocaleString()}) than it provides in salary costs for existing staff (${userSalaries.toLocaleString()}).`;
+    // Evaluation
+    let tagClass = 'warn';
+    let tagText = 'UNCLEAR cost-benefit advantage';
+    let explanation = `Co-financing (${fmt(coFin)}) is greater than existing-salary coverage (${fmt(userSalaries)}).`;
+    if (userSalaries > coFin){
+      tagClass = 'ok';
+      tagText = 'CLEAR cost-benefit advantage';
+      explanation = `Existing-salary coverage (${fmt(userSalaries)}) exceeds co-financing (${fmt(coFin)}).`;
+    } else if (userSalaries === coFin){
+      tagClass = 'warn';
+      tagText = 'BREAK-EVEN';
+      explanation = `Existing-salary coverage equals co-financing (${fmt(coFin)}).`;
     }
 
-    // show textual
-    document.getElementById('resultEvaluation').textContent = evaluation;
-    document.getElementById('resultExplanation').textContent = explanation;
-    document.getElementById('resultContainer').classList.remove('hidden');
+    resultTag.className = `tag ${tagClass}`;
+    resultTag.textContent = tagText;
+    resultExplanation.textContent = explanation;
+    resultContainer.classList.remove('hidden');
 
-    // bar
     const sumSeg = coverageUsed + other + userSalaries + coFin;
-    const barContainer = document.getElementById('barContainer');
-    if (sumSeg <= 0) {
+    if (sumSeg <= 0){
       barContainer.classList.add('hidden');
-      return;
-    }
-    barContainer.classList.remove('hidden');
+    } else {
+      barContainer.classList.remove('hidden');
+      const frac = (x)=> x>0 ? x/sumSeg : 0;
+      bars.overhead.style.flex = String(frac(coverageUsed));
+      bars.other.style.flex    = String(frac(other));
+      bars.salary.style.flex   = String(frac(userSalaries));
+      bars.cofin.style.flex    = String(frac(coFin));
 
-    function fraction(x) {
-      return (sumSeg > 0 && x > 0) ? x / sumSeg : 0;
+      bars.overhead.innerHTML = label2Lines('Indirect', coverageUsed);
+      bars.other.innerHTML    = label2Lines('Other costs', other);
+      bars.salary.innerHTML   = label2Lines('Ex. salaries', userSalaries);
+      bars.cofin.innerHTML    = label2Lines('Co-finance', coFin);
     }
-    const overheadFrac = fraction(coverageUsed);
-    const otherFrac    = fraction(other);
-    const salaryFrac   = fraction(userSalaries);
-    const cofinFrac    = fraction(coFin);
 
-    document.getElementById('overheadBar').style.flex = overheadFrac.toString();
-    document.getElementById('otherBar').style.flex    = otherFrac.toString();
-    document.getElementById('salaryBar').style.flex   = salaryFrac.toString();
-    document.getElementById('cofinBar').style.flex    = cofinFrac.toString();
-
-    function label2Lines(lbl, val) {
-      if (val <= 0) return '';
-      return `${lbl}<br>${val.toLocaleString()}`;
-    }
-    document.getElementById('overheadBar').innerHTML = label2Lines('Indirect', coverageUsed);
-    document.getElementById('otherBar').innerHTML    = label2Lines('Other costs', other);
-    document.getElementById('salaryBar').innerHTML   = label2Lines('Ex. salaries', userSalaries);
-    document.getElementById('cofinBar').innerHTML    = label2Lines('Co-finance', coFin);
+    numbersDump.innerHTML = [
+      `Requested: ${fmt(total)}`,
+      `Dept overhead %: ${isFinite(deptP)?deptP:0}`,
+      `Dept overhead (calc): ${fmt(deptOver)}`,
+      `Funder overhead (entered/calc): ${fmt(fundOver)}`,
+      `Coverage used (min dept,funder): ${fmt(coverageUsed)}`,
+      `Final direct: ${fmt(finalDirect)}`,
+      `Existing salaries (used): ${fmt(userSalaries)}`,
+      `Other direct: ${fmt(other)}`,
+      `Co-finance: ${fmt(coFin)}`
+    ].join('<br>');
   }
-</script>
 
+  function resetAll(){
+    [deptOverheadPercent, requestedAmount, funderPercent, funderAbsolute, existingSalaries].forEach(i=>i.value='');
+    availableDirectLine.textContent = '–';
+    resultContainer.classList.add('hidden');
+    barContainer.classList.add('hidden');
+    toggleFunderFields();
+  }
+
+  // ---------- Events ----------
+  ['input','blur'].forEach(evt=>{
+    deptOverheadPercent.addEventListener(evt, updateAvailableDirect);
+    requestedAmount.addEventListener(evt, updateAvailableDirect);
+    funderPercent.addEventListener(evt, updateAvailableDirect);
+    funderAbsolute.addEventListener(evt, updateAvailableDirect);
+    existingSalaries.addEventListener(evt, updateAvailableDirect);
+  });
+  funderTypeRadios.forEach(r=>r.addEventListener('change', ()=>{toggleFunderFields(); updateAvailableDirect()}));
+  document.getElementById('calcBtn').addEventListener('click', calculate);
+  document.getElementById('resetBtn').addEventListener('click', resetAll);
+
+  // init
+  toggleFunderFields();
+  updateAvailableDirect();
+</script>
 </body>
 </html>
