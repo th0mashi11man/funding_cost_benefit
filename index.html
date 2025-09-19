@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Research Funding Financial Attractiveness Calculator</title>
+  <title>External Research Funding Financial Cost-benefit Calculator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -370,10 +370,10 @@
     // Evaluate
     let evaluation, explanation;
     if (userSalaries > coFin) {
-      evaluation = 'GOOD';
+      evaluation = 'CLEAR cost-benefit advantage';
       explanation = `The grant provides for more in salary costs for existing staff (${userSalaries.toLocaleString()}) than it costs in co-financing (${coFin.toLocaleString()}).`;
     } else {
-      evaluation = 'LESS ATTRACTIVE';
+      evaluation = 'UNCLEAR cost-benefit advantage';
       explanation = `The grant costs more in co-financing (${coFin.toLocaleString()}) than it provides in salary costs for existing staff (${userSalaries.toLocaleString()}).`;
     }
 
