@@ -1,1 +1,1 @@
-# funding_finance_attractiveness
+# This simple javascript tool performs a basic cost-benefit analysis on external research funding
