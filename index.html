@@ -33,7 +33,7 @@
   .seg{display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;padding:0 6px;text-shadow:0 1px 2px rgba(0,0,0,.28)}
   .s-over{background:var(--gold)} .s-other{background:var(--green)}
   .s-sal{background:var(--blue)} .s-fac{background:var(--purple)} .s-cof{background:var(--red)}
-  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px; margin-bottom:8px}
   .legend-item{display:inline-flex;align-items:center;gap:6px;font-size:.9rem;color:var(--muted)}
   .legend-swatch{width:14px;height:14px;border-radius:3px;display:inline-block}
   .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#0b1330;border:1px solid var(--border);color:#9fb0c7;font-size:.9rem}
@@ -144,7 +144,7 @@
         <span class="legend-item"><span class="legend-swatch" style="background:var(--gold)"></span>Indirect (funder)</span>
         <span class="legend-item"><span class="legend-swatch" style="background:var(--green)"></span>Other direct</span>
         <span class="legend-item"><span class="legend-swatch" style="background:var(--blue)"></span>Existing salaries</span>
-        <span class="legend-item"><span class="legend-swatch" style="background:var(--purple)"></span>Univ/Fac co-fund</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--purple)"></span>Univ/Fac co-financing</span>
         <span class="legend-item"><span class="legend-swatch" style="background:var(--red)"></span>Dept co-finance</span>
       </div>
 
@@ -400,9 +400,15 @@
     const other = Math.max(0, direct - plannedSal);
 
     let cls='warn', txt='UNCLEAR cost-benefit advantage';
-    let expl=`Dept co-finance after Univ/Faculty (${fmt(coFinNet)}) is greater than existing-salary coverage (${fmt(userSalaries)}).`;
-    if(userSalaries>coFinNet){ cls='ok'; txt='CLEAR cost-benefit advantage'; expl=`Existing-salary coverage (${fmt(userSalaries)}) exceeds dept co-finance after Univ/Faculty (${fmt(coFinNet)}).`; }
-    else if(userSalaries===coFinNet){ cls='warn'; txt='BREAK-EVEN'; expl=`Existing-salary coverage equals dept co-finance after Univ/Faculty (${fmt(coFinNet)}).`; }
+    let expl=`Department co-financing cost after Univ/Faculty contribution (${fmt(coFinNet)}) is greater than coverage of existing-salary costs (${fmt(userSalaries)}).`;
+    if(userSalaries>coFinNet){
+      cls='ok'; txt='CLEAR cost-benefit advantage';
+      expl=`Coverage of existing-salary costs (${fmt(userSalaries)}) exceeds department co-financing cost after Univ/Faculty contribution (${fmt(coFinNet)}).`;
+    }
+    else if(userSalaries===coFinNet){
+      cls='warn'; txt='BREAK-EVEN';
+      expl=`Coverage of existing-salary costs equals department co-financing cost after Univ/Faculty contribution (${fmt(coFinNet)}).`;
+    }
 
     resultTag.className='tag '+cls; resultTag.textContent=txt; resultExplanation.textContent=expl;
     resultContainer.classList.remove('hidden');
@@ -444,7 +450,7 @@
       `Other direct: ${fmt(other)}`,
       `Dept co-finance before Univ/Fac: ${fmt(coFinRaw)}`,
       `Univ/Fac co-funding (applied): ${fmt(facUsed)}${ufAgg.note?` — ${ufAgg.note}`:''}`,
-      `Dept co-finance after Univ/Fac: ${fmt(coFinNet)}`
+      `Department co-financing cost after Univ/Faculty contribution: ${fmt(coFinNet)}`
     ].join('<br>');
   }
   function resetAll(){
@@ -463,20 +469,18 @@
 
   // ---------- config load + UI build
   async function loadConfig(){
-    const cacheBust = `?v=${Date.now()}`; // bypass GitHub Pages caching
+    const cacheBust = `?v=${Date.now()}`;
     try{
       const res = await fetch('config.json'+cacheBust, { cache: 'no-store' });
       if(!res.ok) throw new Error('HTTP '+res.status);
       CONFIG = await res.json();
       configWarn.classList.add('hidden');
-      // show overhead badge when external config is loaded
       const lbl = CONFIG.overhead?.label || '';
       const sal = CONFIG.overhead?.salary_percent ?? 0;
       const oth = CONFIG.overhead?.other_percent ?? 0;
       ohBadge.innerHTML = `${lbl}: <span class="mono">${sal}%</span> on salaries · <span class="mono">${oth}%</span> on other costs`;
       ohBadge.classList.remove('hidden');
     }catch(e){
-      // external failed: warn & try embedded fallback
       configWarn.classList.remove('hidden');
       const embedded = document.getElementById('embedded-config');
       if(embedded?.textContent){
@@ -484,7 +488,6 @@
         catch{ CONFIG = null; }
       }
       if(!CONFIG){
-        // minimal default (Other only)
         CONFIG = {
           title: "Research Funding Financial Cost-Benefit Calculator",
           overhead: { label: "", salary_percent: 62, other_percent: 52 },
@@ -492,7 +495,6 @@
           schemes: [{ id:'other', name:'Other', funder:{mode:'manual', value:null, label:'Manual entry'}, uf_rules:[] }]
         };
       }
-      // keep badge hidden when not using external file (per your preference)
       ohBadge.classList.add('hidden');
     }
 
@@ -505,7 +507,6 @@
     (CONFIG.schemes||[]).forEach(s=>{
       SCHEMES[s.id] = { name:s.name, funder:s.funder||{mode:'none',value:0,label:'—'}, uf_rules:Array.isArray(s.uf_rules)?s.uf_rules:[] };
     });
-    // ensure Other exists
     if(!SCHEMES['other']) SCHEMES['other'] = { name:'Other', funder:{mode:'manual',value:null,label:'Manual entry'}, uf_rules:[] };
 
     // page title
