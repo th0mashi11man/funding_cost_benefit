@@ -1,7 +1,7 @@
 {
-  "title": "Research Funding Financial Cost-Benefit Calculator",
+  "title": "AIT Research Funding Financial Cost-Benefit Calculator",
   "overhead": {
-    "label": "ITIT 2025",
+    "label": "2025",
     "salary_percent": 62,
     "other_percent": 52
   },
@@ -11,26 +11,26 @@
     {
       "id": "vr",
       "name": "VR – Swedish Research Council",
-      "funder": { "mode": "percent_overhead", "value": 100, "label": "Covers 100% of overhead" },
+      "funder": { "mode": "percent_overhead", "value": 100, "label": "Covers all overhead costs" },
       "uf_rules": []
     },
     {
       "id": "forte",
       "name": "Forte",
-      "funder": { "mode": "percent_overhead", "value": 100, "label": "Covers 100% of overhead" },
+      "funder": { "mode": "percent_overhead", "value": 100, "label": "Covers all overhead costs" },
       "uf_rules": []
     },
     {
       "id": "formas",
       "name": "Formas",
-      "funder": { "mode": "percent_overhead", "value": 100, "label": "Covers 100% of overhead" },
+      "funder": { "mode": "percent_overhead", "value": 100, "label": "Covers all overhead costs" },
       "uf_rules": []
     },
 
     {
       "id": "kaw_project",
       "name": "KAW – Projects",
-      "funder": { "mode": "percent_overhead", "value": 20, "label": "Covers 20% of overhead" },
+      "funder": { "mode": "percent_overhead", "value": 20, "label": "Up to 20% for indirect costs" },
       "uf_rules": [
         { "name": "Vice Chancellor", "mode": "percent_total", "value": 25, "notes": "VC 25% of total" },
         { "name": "Faculty", "mode": "percent_total_capped_per_year", "value": 5, "per_year_cap": 1000000, "notes": "Faculty 5% (max 1M/yr)" }
@@ -39,7 +39,7 @@
     {
       "id": "kaw_scholar",
       "name": "KAW – Scholars",
-      "funder": { "mode": "percent_overhead", "value": 20, "label": "Covers 20% of overhead" },
+      "funder": { "mode": "percent_overhead", "value": 20, "label": "Up to 20% for indirect costs" },
       "uf_rules": [
         { "name": "Vice Chancellor", "mode": "percent_total", "value": 25, "notes": "VC 25% of total" },
         { "name": "Faculty", "mode": "percent_total_capped_per_year", "value": 5, "per_year_cap": 1000000, "notes": "Faculty 5% (max 1M/yr)" }
@@ -49,7 +49,7 @@
     {
       "id": "mmw_project",
       "name": "MMW – Projects",
-      "funder": { "mode": "percent_overhead", "value": 20, "label": "Covers 20% of overhead" },
+      "funder": { "mode": "percent_overhead", "value": 20, "label": "Up to 20% for indirect costs" },
       "uf_rules": [
         { "name": "Vice Chancellor", "mode": "percent_total", "value": 25, "notes": "VC 25% of total" }
       ]
@@ -57,7 +57,7 @@
     {
       "id": "maw_project",
       "name": "MAW – Projects",
-      "funder": { "mode": "percent_overhead", "value": 20, "label": "Covers 20% of overhead" },
+      "funder": { "mode": "percent_overhead", "value": 20, "label": "Up to 20% for indirect costs" },
       "uf_rules": [
         { "name": "Vice Chancellor", "mode": "percent_total", "value": 25, "notes": "VC 25% of total" }
       ]
@@ -65,8 +65,8 @@
 
     {
       "id": "waf",
-      "name": "Wallenberg Academy Fellow (WAF)",
-      "funder": { "mode": "percent_overhead", "value": 20, "label": "Covers 20% of overhead" },
+      "name": "Wallenberg Academy Fellow",
+      "funder": { "mode": "percent_overhead", "value": 20, "label": "Up to 20% for indirect costs" },
       "uf_rules": [
         { "name": "Vice Chancellor", "mode": "fixed_per_year", "amount_per_year": 750000, "notes": "VC 750k/yr" },
         { "name": "Faculty", "mode": "fixed_per_year", "amount_per_year": 250000, "notes": "Faculty 250k/yr" }
@@ -74,9 +74,9 @@
     },
 
     {
-      "id": "rj_programmes",
-      "name": "RJ – Programmes",
-      "funder": { "mode": "none", "value": 0, "label": "No specified indirect coverage" },
+      "id": "rj_programme",
+      "name": "RJ – Programme",
+      "funder": { "mode": "none", "value": 0, "label": "No coverage" },
       "uf_rules": [
         { "name": "Vice Chancellor", "mode": "percent_total", "value": 25, "notes": "VC 25% of total" },
         { "name": "Faculty", "mode": "percent_total_capped_per_year", "value": 5, "per_year_cap": 1000000, "notes": "Faculty 5% (max 1M/yr)" }
@@ -85,13 +85,13 @@
     {
       "id": "rj_project",
       "name": "RJ – Project",
-      "funder": { "mode": "none", "value": 0, "label": "No specified indirect coverage" },
+      "funder": { "mode": "none", "value": 0, "label": "No coverage" },
       "uf_rules": []
     },
     {
       "id": "rj_profutura",
       "name": "RJ – Pro Futura",
-      "funder": { "mode": "none", "value": 0, "label": "No specified indirect coverage" },
+      "funder": { "mode": "none", "value": 0, "label": "No coverage" },
       "uf_rules": [
         { "name": "Vice Chancellor", "mode": "fixed_per_year", "amount_per_year": 750000, "notes": "VC 750k/yr" },
         { "name": "Faculty", "mode": "fixed_per_year", "amount_per_year": 250000, "notes": "Faculty 250k/yr" }
@@ -101,7 +101,7 @@
     {
       "id": "erc_stg",
       "name": "ERC – Starting Grant",
-      "funder": { "mode": "percent_total", "value": 25, "label": "Covers up to 25% indirect (cascading on total)" },
+      "funder": { "mode": "percent_total", "value": 25, "label": "Up to 25% for indirect costs" },
       "uf_rules": [
         { "name": "Vice Chancellor", "mode": "fixed_per_year", "amount_per_year": 750000, "notes": "VC 750k/yr" },
         { "name": "Faculty", "mode": "fixed_per_year", "amount_per_year": 250000, "notes": "Faculty 250k/yr" }
@@ -110,7 +110,7 @@
     {
       "id": "erc_cog",
       "name": "ERC – Consolidator Grant",
-      "funder": { "mode": "percent_total", "value": 25, "label": "Covers up to 25% indirect (cascading on total)" },
+      "funder": { "mode": "percent_total", "value": 25, "label": "Up to 25% for indirect costs" },
       "uf_rules": [
         { "name": "Vice Chancellor", "mode": "fixed_per_year", "amount_per_year": 750000, "notes": "VC 750k/yr" },
         { "name": "Faculty", "mode": "fixed_per_year", "amount_per_year": 250000, "notes": "Faculty 250k/yr" }
@@ -119,12 +119,17 @@
     {
       "id": "erc_syg",
       "name": "ERC – Synergy Grant",
-      "funder": { "mode": "percent_total", "value": 25, "label": "Covers up to 25% indirect (cascading on total)" },
+      "funder": { "mode": "percent_total", "value": 25, "label": "Up to 25% for indirect costs" },
       "uf_rules": [
         { "name": "Vice Chancellor", "mode": "fixed_per_year", "amount_per_year": 750000, "notes": "VC 750k/yr" }
       ]
     },
-
+    {
+      "id": "horizon",
+      "name": "EU – Horizon",
+      "funder": { "mode": "percent_overhead", "value": 25, "label": "Up to 25% for indirect costs" },
+      "uf_rules": []
+    },
     {
       "id": "ssf_frl",
       "name": "SSF – Future Research Leaders",
@@ -133,16 +138,6 @@
         { "name": "Vice Chancellor", "mode": "fixed_per_year", "amount_per_year": 750000, "notes": "VC 750k/yr" }
       ]
     },
-
-    {
-      "id": "fas_centres",
-      "name": "FAS-centres",
-      "funder": { "mode": "none", "value": 0, "label": "No specified indirect coverage" },
-      "uf_rules": [
-        { "name": "Faculty", "mode": "percent_total_capped_per_year", "value": 5, "per_year_cap": 1000000, "notes": "Faculty 5% (max 1M/yr)" }
-      ]
-    },
-
     {
       "id": "other",
       "name": "Other",
