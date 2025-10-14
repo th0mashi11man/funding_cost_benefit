@@ -1,322 +1,545 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Research Funding Financial Cost-Benefit Calculator</title>
-  <style>
-    :root{
-      --bg:#0b1020; --panel:#11192f; --muted:#9fb0c7; --text:#e6eef7;
-      --accent:#7bbfff; --ok:#5bd69f; --warn:#ffd166; --bad:#ff6b6b;
-      --gold:#f1c232; --green:#93c47d; --blue:#6fa8dc; --red:#e06666;
-      --border:rgba(255,255,255,0.08);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      margin:0; color:var(--text); background:linear-gradient(180deg,#0b1020 0%, #0e1430 100%);
-    }
-    .wrap{max-width:920px; margin:32px auto; padding:24px;}
-    h1{margin:0 0 6px; font-size:clamp(1.2rem,2.4vw,1.6rem)}
-
-    .card{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:18px 18px 6px; box-shadow:0 10px 30px rgba(0,0,0,0.25)}
-    .grid{display:grid; gap:14px; grid-template-columns:repeat(12,1fr)}
-    .col-12{grid-column:span 12}
-    @media (min-width:720px){.col-6{grid-column:span 6}}
-
-    label{display:block; font-weight:600; margin:8px 0 6px}
-    input[type="text"], input[type="number"], select{width:100%; background:#0b1330; color:var(--text); border:1px solid var(--border); border-radius:10px; padding:10px 12px; font-size:1rem}
-    .row{display:flex; gap:10px; align-items:center}
-    .radio-group{display:flex; gap:14px; margin-top:6px}
-    .radio{display:flex; gap:8px; align-items:center}
-
-    button{background:var(--accent); color:#071225; font-weight:700; border:none; border-radius:12px; padding:12px 16px; cursor:pointer; font-size:1rem; margin-top:8px}
-    button.secondary{background:transparent; color:var(--muted); border:1px solid var(--border)}
-
-    .result{margin-top:18px; background:#0d1538; border:1px solid var(--border); padding:16px; border-radius:12px; position:relative}
-    .tag{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; font-weight:700; letter-spacing:.2px}
-    .ok{background:rgba(91,214,159,.12); color:var(--ok); border:1px solid rgba(91,214,159,.25)}
-    .bad{background:rgba(255,107,107,.12); color:var(--bad); border:1px solid rgba(255,107,107,.25)}
-    .warn{background:rgba(255,209,102,.12); color:var(--warn); border:1px solid rgba(255,209,102,.25)}
-
-    .bar-container{display:flex; height:48px; width:100%; border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-top:12px}
-    .bar-segment{display:flex; align-items:center; justify-content:center; font-weight:800; text-align:center; white-space:normal; padding:0 6px; font-size:.85rem; text-shadow:0 1px 2px rgba(0,0,0,.28)}
-    .bar-overhead{background:var(--gold)}
-    .bar-other{background:var(--green)}
-    .bar-salary{background:var(--blue)}
-    .bar-cofin{background:var(--red)}
-
-    .hidden{display:none}
-    .row-end{display:flex; gap:10px; justify-content:flex-end; margin-top:8px}
-    .legend{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px}
-    .legend .chip{display:inline-flex; gap:8px; align-items:center; padding:4px 8px; border-radius:999px; border:1px solid var(--border); background:#0b1330; color:var(--muted); font-size:.85rem}
-    .dot{width:10px; height:10px; border-radius:50%}
-    .dot.o{background:var(--gold)} .dot.oth{background:var(--green)} .dot.s{background:var(--blue)} .dot.c{background:var(--red)}
-
-    .inline-mono{font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
-    .help{font-size:.9rem; color:var(--muted)}
-    .err{color:var(--bad); font-size:.9rem}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Research Funding Financial Cost-Benefit Calculator</title>
+<style>
+  :root{
+    --bg:#0b1020; --panel:#11192f; --muted:#9fb0c7; --text:#e6eef7;
+    --accent:#7bbfff; --ok:#5bd69f; --warn:#ffd166; --bad:#ff6b6b;
+    --gold:#f1c232; --green:#93c47d; --blue:#6fa8dc; --red:#e06666; --purple:#b37bd6;
+    --border:rgba(255,255,255,0.14); --panel2:#0d1431;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background:#0b1020; color:var(--text)}
+  .wrap{max-width:980px; margin:32px auto; padding:0 16px}
+  h1{margin:0 0 14px; font-size:clamp(1.1rem,2.2vw,1.6rem)}
+  .section{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; margin-top:16px}
+  .grid{display:grid; gap:14px}
+  @media (min-width:820px){.grid.cols-2{grid-template-columns:1fr 1fr}}
+  label{display:block; font-weight:600; margin:6px 0}
+  input,select{width:100%; background:#0b1330; color:var(--text); border:1px solid var(--border); border-radius:10px; padding:10px 12px; font-size:1rem}
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:flex-start}
+  .help{font-size:.9rem; color:var(--muted)}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-variant-numeric:tabular-nums}
+  button{background:var(--accent); color:#071225; font-weight:700; border:none; border-radius:10px; padding:12px 16px; cursor:pointer; font-size:1rem}
+  button.secondary{background:transparent; color:#9fb0c7; border:1px solid var(--border)}
+  .result{background:var(--panel2); border:1px solid var(--border); border-radius:12px; padding:14px; margin-top:14px}
+  .tag{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; font-weight:700}
+  .ok{background:rgba(91,214,159,.12); color:var(--ok); border:1px solid rgba(91,214,159,.25)}
+  .warn{background:rgba(255,209,102,.12); color:var(--warn); border:1px solid rgba(255,209,102,.25)}
+  .bar{display:flex; height:48px; width:100%; border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-top:10px}
+  .seg{display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.85rem; padding:0 6px; text-shadow:0 1px 2px rgba(0,0,0,.28)}
+  .s-over{background:var(--gold)} .s-other{background:var(--green)}
+  .s-sal{background:var(--blue)} .s-fac{background:var(--purple)} .s-cof{background:var(--red)}
+  details{margin-top:10px}
+  .pill{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#0b1330; border:1px solid var(--border); color:#9fb0c7; font-size:.9rem}
+  .legend{display:flex; flex-wrap:wrap; gap:10px; margin-top:8px}
+  .legend-item{display:inline-flex; align-items:center; gap:6px; font-size:.9rem; color:var(--muted)}
+  .legend-swatch{width:14px; height:14px; border-radius:3px; display:inline-block}
+  .hidden{display:none}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Research Funding Financial Cost-Benefit Calculator</h1>
+<div class="wrap">
+  <h1>Research Funding Financial Cost-Benefit Calculator</h1>
 
-    <div class="card">
-      <div class="grid">
-        <div class="col-6">
-          <label for="deptOverheadPercent">1) Overhead rate (%)</label>
-          <input id="deptOverheadPercent" inputmode="decimal" placeholder="e.g., 50" />
-        </div>
-        <div class="col-6">
-          <label for="requestedAmount">2) Total project budget applied for</label>
-          <input id="requestedAmount" inputmode="numeric" placeholder="e.g., 1,000,000" />
-        </div>
-
-        <div class="col-12">
-          <label>3) How is the funder's coverage of indirect costs given? <span class="help">(if the funder doesn’t cover any indirect costs, put 0)</span></label>
-          <div class="radio-group" role="radiogroup" aria-label="Funder coverage type">
-            <label class="radio"><input type="radio" name="funderCoverageType" value="percent" checked /> Percentage</label>
-            <label class="radio"><input type="radio" name="funderCoverageType" value="absolute" /> Fixed amount</label>
-          </div>
-        </div>
-
-        <div class="col-6" id="funderPercentContainer">
-          <label for="funderOverheadPercent">Funder indirect cost coverage (%)</label>
-          <input id="funderOverheadPercent" inputmode="decimal" placeholder="e.g., 20" />
-        </div>
-        <div class="col-6 hidden" id="funderAbsoluteContainer">
-          <label for="funderOverheadAbsolute">Funder overhead coverage (absolute)</label>
-          <input id="funderOverheadAbsolute" inputmode="numeric" placeholder="e.g., 150000" />
-        </div>
-
-        <div class="col-12">
-          <label>Available funding for direct costs:</label>
-          <div><strong id="availableDirectLine" class="inline-mono">–</strong></div>
-          <div id="directWarn" class="err hidden">Enter requested amount and overheads to compute direct costs.</div>
-        </div>
-
-        <div class="col-12">
-          <label for="existingSalaries">4) Amount allocated to existing staff salaries</label>
-          <input id="existingSalaries" inputmode="numeric" placeholder="e.g., 600,000" />
-        </div>
+  <!-- Overhead policy -->
+  <div class="section">
+    <div class="row" style="justify-content:space-between; align-items:center">
+      <strong>Overhead policy</strong>
+      <span class="pill">ITIT 2025: <span class="mono">62%</span> on salaries · <span class="mono">52%</span> on other</span>
+    </div>
+    <div class="grid cols-2">
+      <div>
+        <label for="ohSalaryRate">OH on salaries (%)</label>
+        <input id="ohSalaryRate" data-decimal="true" placeholder="62" value="62" />
       </div>
-
-      <div class="row-end">
-        <button id="calcBtn" aria-label="Calculate financial attractiveness">Calculate</button>
-        <button id="resetBtn" class="secondary" aria-label="Reset inputs">Reset</button>
-      </div>
-
-      <div class="result hidden" id="resultContainer" aria-live="polite">
-        <div id="resultTag" class="tag warn">Result pending…</div>
-        <p id="resultExplanation" class="help" style="margin-top:10px"></p>
-
-        <div class="bar-container hidden" id="barContainer">
-          <div class="bar-segment bar-overhead" id="overheadBar" style="flex:0"></div>
-          <div class="bar-segment bar-other"    id="otherBar"    style="flex:0"></div>
-          <div class="bar-segment bar-salary"   id="salaryBar"   style="flex:0"></div>
-          <div class="bar-segment bar-cofin"    id="cofinBar"    style="flex:0"></div>
-        </div>
-        <div class="legend">
-          <span class="chip"><span class="dot o"></span>Indirect covered</span>
-          <span class="chip"><span class="dot oth"></span>Other direct</span>
-          <span class="chip"><span class="dot s"></span>Existing salaries</span>
-          <span class="chip"><span class="dot c"></span>Co-finance</span>
-        </div>
-
-        <details style="margin-top:12px">
-          <summary>Calculation details (click to expand)</summary>
-          <div id="numbersDump" class="inline-mono" style="margin-top:8px"></div>
-        </details>
+      <div>
+        <label for="ohOtherRate">OH on other costs (%)</label>
+        <input id="ohOtherRate" data-decimal="true" placeholder="52" value="52" />
       </div>
     </div>
   </div>
 
+  <!-- Amount, years & grant scheme -->
+  <div class="section">
+    <div class="grid cols-2">
+      <div>
+        <label for="requestedAmount">Amount to Applied IT (excl. other institutions)</label>
+        <input id="requestedAmount" data-decimal="false" inputmode="numeric" placeholder="e.g., 10 000 000" />
+      </div>
+      <div>
+        <label for="projectYears">Project duration (years)</label>
+        <input id="projectYears" data-decimal="false" inputmode="numeric" placeholder="e.g., 4" />
+      </div>
+
+      <div>
+        <label for="schemeSelect">Grant scheme</label>
+        <select id="schemeSelect">
+          <option value="custom" selected>Custom / Other</option>
+          <!-- VR/Forte/Formas -->
+          <option value="vr">VR – Swedish Research Council</option>
+          <option value="forte">Forte</option>
+          <option value="formas">Formas</option>
+          <!-- Wallenberg family -->
+          <option value="kaw_project">KAW – Projects</option>
+          <option value="kaw_scholar">KAW – Scholars</option>
+          <option value="mmw_project">MMW – Projects</option>
+          <option value="maw_project">MAW – Projects</option>
+          <option value="waf">Wallenberg Academy Fellow (WAF)</option>
+          <!-- RJ -->
+          <option value="rj_programmes">RJ – Programmes</option>
+          <option value="rj_project">RJ – Project</option>
+          <option value="rj_profutura">RJ – Pro Futura</option>
+          <!-- ERC -->
+          <option value="erc_stg">ERC – Starting Grant</option>
+          <option value="erc_cog">ERC – Consolidator Grant</option>
+          <option value="erc_syg">ERC – Synergy Grant</option>
+          <!-- SSF / FAS -->
+          <option value="ssf_frl">SSF – Future Research Leaders</option>
+          <option value="fas_centres">FAS-centres</option>
+        </select>
+        <div class="help" id="schemeInfo">Pick a grant scheme to auto-apply funder coverage and Univ/Faculty co-funding.</div>
+      </div>
+    </div>
+
+    <!-- Funder coverage controls (enabled only for Custom) -->
+    <div class="grid cols-2" style="margin-top:10px">
+      <div>
+        <label for="funderModeSelect">Funder indirect cost coverage</label>
+        <select id="funderModeSelect">
+          <option value="percent_overhead" selected>% of overhead</option>
+          <option value="absolute">Fixed amount</option>
+          <option value="percent_total">% of total (cascading)</option>
+        </select>
+      </div>
+      <div id="funderPercentOverBox">
+        <label for="funderPercentOverhead">Coverage (% of overhead)</label>
+        <input id="funderPercentOverhead" data-decimal="true" placeholder="e.g., 100" />
+      </div>
+      <div id="funderAbsoluteBox" class="hidden">
+        <label for="funderOverheadAbsolute">Coverage (absolute)</label>
+        <input id="funderOverheadAbsolute" data-decimal="false" inputmode="numeric" placeholder="e.g., 150 000" />
+      </div>
+      <div id="funderPercentTotalBox" class="hidden">
+        <label for="funderOverheadPercent">Coverage (% of total, cascading)</label>
+        <input id="funderOverheadPercent" data-decimal="true" placeholder="e.g., 25" />
+      </div>
+
+      <div>
+        <label>Available for direct costs (live)</label>
+        <div class="pill mono" id="availableDirectLine">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Direct cost allocation -->
+  <div class="section">
+    <strong>Direct cost allocation</strong>
+    <div class="grid cols-2" style="margin-top:10px">
+      <div>
+        <label for="plannedSalaryDirect">Planned salary costs (direct)</label>
+        <input id="plannedSalaryDirect" data-decimal="false" inputmode="numeric" placeholder="e.g., 7 000 000" />
+      </div>
+      <div>
+        <label for="existingSalaries">…of which existing staff salaries</label>
+        <input id="existingSalaries" data-decimal="false" inputmode="numeric" placeholder="e.g., 6 000 000" />
+      </div>
+      <div>
+        <label>Available for other direct costs (live)</label>
+        <div class="pill mono" id="availableOtherLine">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calculate & Results -->
+  <div class="section">
+    <div class="row" style="justify-content:flex-end; gap:10px">
+      <button id="calcBtn">Calculate</button>
+      <button id="resetBtn" class="secondary">Reset</button>
+    </div>
+
+    <div class="result hidden" id="resultContainer">
+      <div id="resultTag" class="tag warn">Result pending…</div>
+      <p id="resultExplanation" class="help" style="margin:8px 0 0"></p>
+
+      <div class="bar hidden" id="barContainer">
+        <div class="seg s-over"  id="overheadBar" style="flex:0"></div>
+        <div class="seg s-other" id="otherBar"    style="flex:0"></div>
+        <div class="seg s-sal"   id="salaryBar"   style="flex:0"></div>
+        <div class="seg s-fac"   id="facBar"      style="flex:0"></div>
+        <div class="seg s-cof"   id="cofinBar"    style="flex:0"></div>
+      </div>
+      <div class="legend hidden" id="legend">
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--gold)"></span>Indirect (funder)</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--green)"></span>Other direct</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--blue)"></span>Existing salaries</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--purple)"></span>Univ/Fac co-fund</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--red)"></span>Dept co-finance</span>
+      </div>
+
+      <details>
+        <summary>Calculation details (click to expand)</summary>
+        <div id="numbersDump" class="mono" style="margin-top:8px"></div>
+      </details>
+    </div>
+  </div>
+</div>
+
 <script>
-  // ---------- Utilities ----------
-  const el = id => document.getElementById(id);
-  const fmt = n => (isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:0}) : '–');
-  const cleanNum = (str) => {
-    if (!str) return 0;
-    const s = String(str).replace(/[^\d.,\s]/g,'').replace(/\s+/g,'');
-    const lastComma = s.lastIndexOf(',');
-    const lastDot   = s.lastIndexOf('.');
-    let decIdx = Math.max(lastComma, lastDot);
-    if (decIdx >= 0) {
-      const intPart = s.slice(0, decIdx).replace(/[.,]/g,'');
-      const decPart = s.slice(decIdx+1).replace(/[.,]/g,'');
-      return Number(intPart + '.' + decPart) || 0;
+  // ---------- helpers
+  const $ = id => document.getElementById(id);
+  const fmt = n => (isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:0}).replace(/,/g,' ') : '—');
+  const clamp = (x,min,max)=>Math.max(min,Math.min(x,max));
+
+  // Parse numbers typed with spaces as thousand sep and either '.' or ',' as decimal sep
+  const num = s=>{
+    if(!s) return 0;
+    const t=String(s);
+    let u=t.replace(/[^\d.,\s-]/g,'').replace(/\s+/g,'');
+    const neg=/^-/.test(u); u=u.replace(/-/g,'');
+    const lastComma=u.lastIndexOf(','), lastDot=u.lastIndexOf('.');
+    let dec=null;
+    if(lastComma>=0 || lastDot>=0) dec=(lastComma>lastDot)?',':'.';
+    if(dec){
+      u = u.replace(dec==='.'?/,/g:/\./g,'');
+      const idx=u.indexOf(dec);
+      const ip=u.slice(0,idx).replace(/[^\d]/g,'');
+      const dp=u.slice(idx+1).replace(/[^\d]/g,'');
+      return (neg?-1:1)*Number(ip+'.'+dp || '0');
+    }else{
+      return (neg?-1:1)*Number(u.replace(/[^\d]/g,'' )||'0');
     }
-    return Number(s.replace(/[.,]/g,'')) || 0;
   };
-  const clamp = (x,min,max) => Math.max(min, Math.min(x, max));
 
-  // ---------- Elements ----------
-  const deptOverheadPercent = el('deptOverheadPercent');
-  const requestedAmount     = el('requestedAmount');
-  const funderTypeRadios    = document.querySelectorAll('input[name="funderCoverageType"]');
-  const funderPercent       = el('funderOverheadPercent');
-  const funderAbsolute      = el('funderOverheadAbsolute');
-  const funderPercentBox    = el('funderPercentContainer');
-  const funderAbsoluteBox   = el('funderAbsoluteContainer');
-  const availableDirectLine = el('availableDirectLine');
-  const directWarn          = el('directWarn');
-  const existingSalaries    = el('existingSalaries');
-  const resultContainer     = el('resultContainer');
-  const resultTag           = el('resultTag');
-  const resultExplanation   = el('resultExplanation');
-  const barContainer        = el('barContainer');
-  const bars = {
-    overhead: el('overheadBar'), other: el('otherBar'), salary: el('salaryBar'), cofin: el('cofinBar')
+  // Live formatter with spaces as thousand sep; keeps user's decimal sep
+  function formatNumericInput(el){
+    const allowDecimal = el.getAttribute('data-decimal') === 'true';
+    const start = el.selectionStart ?? el.value.length;
+    const original = el.value;
+    const digitsBeforeCaret = (original.slice(0,start).match(/\d/g)||[]).length;
+
+    let value = original.replace(/[^\d.,]/g,'');
+    const lastComma=value.lastIndexOf(','), lastDot=value.lastIndexOf('.');
+    let decSep = null;
+    if(allowDecimal && (lastComma>=0 || lastDot>=0)) decSep = (lastComma>lastDot)?',':'.';
+
+    if(decSep){ value = value.replace(decSep==='.'?/,/g:/\./g,''); }
+    else { value = value.replace(/[.,]/g,''); }
+
+    let intPart = value, fracPart='';
+    if(decSep){
+      const idx=value.indexOf(decSep);
+      if(idx>=0){
+        intPart = value.slice(0,idx);
+        fracPart = value.slice(idx+1).replace(/[^\d]/g,'');
+      }
+    }
+    intPart = intPart.replace(/[^\d]/g,'');
+    const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+    let out = formattedInt;
+    if(allowDecimal && decSep && fracPart.length>0){ out += decSep + fracPart; }
+    el.value = out;
+
+    // restore caret
+    const posFromDigitIndex = (str, idx)=>{
+      if(idx<=0) return 0;
+      let count=0;
+      for(let i=0;i<str.length;i++){
+        if(/\d/.test(str[i])){ count++; if(count===idx) return i+1; }
+      }
+      return str.length;
+    };
+    const newPos = posFromDigitIndex(out, digitsBeforeCaret);
+    try{ el.setSelectionRange(newPos,newPos); }catch(e){}
+  }
+
+  function attachFormatters(){
+    document.querySelectorAll('input[data-decimal]').forEach(el=>{
+      el.addEventListener('input', ()=>{ formatNumericInput(el); updateLive(); });
+      el.addEventListener('blur',  ()=>{ formatNumericInput(el); updateLive(); });
+    });
+  }
+
+  // ---------- elements
+  const ohSalaryRate=$('ohSalaryRate'), ohOtherRate=$('ohOtherRate');
+
+  const requestedAmount=$('requestedAmount'), projectYears=$('projectYears');
+  const schemeSelect=$('schemeSelect'), schemeInfo=$('schemeInfo');
+
+  const funderModeSelect=$('funderModeSelect');
+  const funderPercentOverBox=$('funderPercentOverBox');
+  const funderAbsoluteBox=$('funderAbsoluteBox');
+  const funderPercentTotalBox=$('funderPercentTotalBox');
+  const funderPercentOverhead=$('funderPercentOverhead');
+  const funderOverheadAbsolute=$('funderOverheadAbsolute');
+  const funderOverheadPercent=$('funderOverheadPercent');
+
+  const availableDirectLine=$('availableDirectLine');
+  const availableOtherLine=$('availableOtherLine');
+  const plannedSalaryDirect=$('plannedSalaryDirect'), existingSalaries=$('existingSalaries');
+
+  const resultContainer=$('resultContainer'), resultTag=$('resultTag'), resultExplanation=$('resultExplanation');
+  const barContainer=$('barContainer'), legend=$('legend');
+  const bars={overhead:$('overheadBar'), other:$('otherBar'), salary:$('salaryBar'), fac:$('facBar'), cofin:$('cofinBar')};
+  const numbersDump=$('numbersDump');
+
+  // ---------- scheme configuration
+  const UF = {
+    vc25: (total, years) => ({ amount: 0.25*total, note:'VC 25% of total' }),
+    fac5capped: (total, years) => ({ amount: Math.min(0.05*total, 1_000_000*Math.max(1, Math.round(num(years)))), note:'Faculty 5% (max 1M/yr)' }),
+    vc750: (total, years) => ({ amount: 750_000*Math.max(1, Math.round(num(years))), note:'VC 750k/yr' }),
+    fac250: (total, years) => ({ amount: 250_000*Math.max(1, Math.round(num(years))), note:'Faculty 250k/yr' }),
+    none: () => ({ amount: 0, note:'No Univ/Faculty co-funding' })
   };
-  const numbersDump         = el('numbersDump');
 
-  // ---------- Logic ----------
-  function getCascadingOverhead(total, percent){
-    const p = Math.max(0, cleanNum(percent));
-    if (p <= 0 || total <= 0) return 0;
-    const r = p/100;
-    return Math.round(total * (r/(1+r)));
+  const SCHEMES = {
+    custom:        { funder:{mode:'percent_overhead', value:null, label:'Custom (set below)'}, uf:'none' },
+    vr:            { funder:{mode:'percent_overhead', value:100, label:'Covers 100% of overhead'}, uf:'none' },
+    forte:         { funder:{mode:'percent_overhead', value:100, label:'Covers 100% of overhead'}, uf:'none' },
+    formas:        { funder:{mode:'percent_overhead', value:100, label:'Covers 100% of overhead'}, uf:'none' },
+
+    // Wallenberg family: funder covers 20% of overhead
+    kaw_project:   { funder:{mode:'percent_overhead', value:20, label:'Covers 20% of overhead'}, uf:['vc25','fac5capped'] },
+    kaw_scholar:   { funder:{mode:'percent_overhead', value:20, label:'Covers 20% of overhead'}, uf:['vc25','fac5capped'] },
+    mmw_project:   { funder:{mode:'percent_overhead', value:20, label:'Covers 20% of overhead'}, uf:['vc25'] },
+    maw_project:   { funder:{mode:'percent_overhead', value:20, label:'Covers 20% of overhead'}, uf:['vc25'] },
+    waf:           { funder:{mode:'percent_overhead', value:20, label:'Covers 20% of overhead'}, uf:['vc750','fac250'] },
+
+    // RJ
+    rj_programmes: { funder:{mode:'none', value:0, label:'No specified indirect coverage'}, uf:['vc25','fac5capped'] },
+    rj_project:    { funder:{mode:'none', value:0, label:'No specified indirect coverage'}, uf:'none' }, /* no VC co-funding */
+    rj_profutura:  { funder:{mode:'none', value:0, label:'No specified indirect coverage'}, uf:['vc750','fac250'] },
+
+    // ERC
+    erc_stg:       { funder:{mode:'percent_total', value:25, label:'Covers up to 25% indirect (cascading on total)'}, uf:['vc750','fac250'] },
+    erc_cog:       { funder:{mode:'percent_total', value:25, label:'Covers up to 25% indirect (cascading on total)'}, uf:['vc750','fac250'] },
+    erc_syg:       { funder:{mode:'percent_total', value:25, label:'Covers up to 25% indirect (cascading on total)'}, uf:['vc750'] },
+
+    // SSF / FAS
+    ssf_frl:       { funder:{mode:'none', value:0, label:'No specified indirect coverage'}, uf:['vc750'] },
+    fas_centres:   { funder:{mode:'none', value:0, label:'No specified indirect coverage'}, uf:['fac5capped'] },
+  };
+
+  let activeScheme = SCHEMES['custom'];
+
+  // ---------- salary clamping
+  function clampSalaryInputs(direct){
+    // Cap planned salary ≤ available direct
+    let planned = Math.max(0, Math.round(num(plannedSalaryDirect.value)));
+    if(planned > direct){
+      planned = direct;
+      plannedSalaryDirect.value = fmt(planned);
+    }
+    // Cap existing ≤ planned salary
+    let existing = Math.max(0, Math.round(num(existingSalaries.value)));
+    if(existing > planned){
+      existing = planned;
+      existingSalaries.value = fmt(existing);
+    }
   }
 
-  function getDeptOverhead(total){
-    return getCascadingOverhead(total, deptOverheadPercent.value);
+  // ---------- core calculations (iterative effective rate via salary share)
+  let lastShare = 0.5;
+  function getFunderCoverage(total, deptOver){
+    const mode = activeScheme.funder.mode;
+    if(mode==='percent_overhead'){
+      const p = (activeScheme.valueOverride ?? activeScheme.funder.value ?? num(funderPercentOverhead.value));
+      return Math.round(deptOver * Math.max(0, Math.min(p,100)) / 100);
+    }
+    if(mode==='percent_total'){
+      const p = (activeScheme.valueOverride ?? activeScheme.funder.value ?? num(funderOverheadPercent.value));
+      const dec = Math.max(0, Math.min(p,500))/100;
+      return Math.round(total * (dec/(1+dec))); // cascading on total
+    }
+    if(mode==='absolute'){
+      const a = (activeScheme.valueOverride ?? num(funderOverheadAbsolute.value));
+      return Math.max(0, Math.min(Math.round(a), total));
+    }
+    return 0; // 'none'
   }
 
-  function getFunderOverhead(total){
-    const type = [...funderTypeRadios].find(r=>r.checked)?.value || 'percent';
-    if (type === 'percent') return getCascadingOverhead(total, funderPercent.value);
-    const abs = Math.round(cleanNum(funderAbsolute.value));
-    return clamp(abs, 0, Math.max(0,total));
+  function calcWithDerivedShare(total){
+    let share = lastShare;
+    const rs = Math.max(0, Math.min(num(ohSalaryRate.value)/100,5));
+    const ro = Math.max(0, Math.min(num(ohOtherRate.value)/100,5));
+    let deptOver=0, fundCov=0, used=0, direct=0;
+
+    for(let i=0;i<3;i++){
+      const rEff = rs*share + ro*(1-share);
+      deptOver = Math.round(total * (rEff/(1+rEff)));
+      fundCov  = getFunderCoverage(total, deptOver);
+      used     = Math.min(deptOver, fundCov);
+      direct   = Math.max(0, total - used);
+      const ps = Math.max(0, Math.round(num(plannedSalaryDirect.value)));
+      share    = direct>0 ? Math.max(0, Math.min(ps/direct, 1)) : 0;
+    }
+    lastShare = share;
+    const rEff = rs*share + ro*(1-share);
+    return {deptOver, fundCov, used, direct, rEff, share};
   }
 
-  function computeAvailableDirect(){
-    const total = Math.round(cleanNum(requestedAmount.value));
-    if (total <= 0) return 0;
-    const dept = getDeptOverhead(total);
-    const fund = getFunderOverhead(total);
-    if (fund <= 0) return total; // all direct
-    const used = Math.min(dept, fund);
-    return Math.max(0, total - used);
+  function ufFromScheme(total, years, coFinRaw){
+    const rule = activeScheme.uf;
+    if(!rule || rule==='none') return {amount:0, note:'—'};
+    const rules = Array.isArray(rule) ? rule : [rule];
+    let sum=0, notes=[];
+    for(const r of rules){
+      const {amount, note} = UF[r](total, years);
+      sum += amount; notes.push(note);
+    }
+    const applied = Math.min(sum, coFinRaw);
+    return {amount: applied, note: notes.join(' + ')};
   }
 
-  function updateAvailableDirect(){
-    const direct = computeAvailableDirect();
+  // ---------- UI wiring
+  function toggleFunderInputs(){
+    const isCustom = (schemeSelect.value==='custom');
+    funderModeSelect.disabled = !isCustom;
+    funderPercentOverhead.disabled = !isCustom;
+    funderOverheadAbsolute.disabled = !isCustom;
+    funderOverheadPercent.disabled = !isCustom;
+
+    const mode = isCustom ? funderModeSelect.value : activeScheme.funder.mode;
+    funderPercentOverBox.classList.toggle('hidden', !(mode==='percent_overhead'));
+    funderAbsoluteBox.classList.toggle('hidden', !(mode==='absolute'));
+    funderPercentTotalBox.classList.toggle('hidden', !(mode==='percent_total'));
+  }
+
+  function applyScheme(){
+    activeScheme = SCHEMES[schemeSelect.value] || SCHEMES['custom'];
+    const label = activeScheme.funder.label || '—';
+    const ufText = (activeScheme.uf && activeScheme.uf!=='none')
+      ? 'Univ/Faculty: ' + (Array.isArray(activeScheme.uf)
+          ? activeScheme.uf.map(k=>UF[k](0,0).note).join(' + ')
+          : UF[activeScheme.uf](0,0).note)
+      : 'Univ/Faculty: none for this scheme';
+
+    schemeInfo.textContent = `Funder: ${label}. ${ufText}.`;
+
+    if(schemeSelect.value!=='custom'){
+      funderModeSelect.value = activeScheme.funder.mode==='none' ? 'percent_overhead' : activeScheme.funder.mode;
+      if(activeScheme.funder.mode==='percent_overhead') funderPercentOverhead.value = String(activeScheme.funder.value ?? '');
+      if(activeScheme.funder.mode==='percent_total')    funderOverheadPercent.value = String(activeScheme.funder.value ?? '');
+      if(activeScheme.funder.mode==='absolute')         funderOverheadAbsolute.value = String(activeScheme.funder.value ?? '');
+    }
+    toggleFunderInputs();
+    updateLive();
+  }
+
+  function updateLive(){
+    const total=Math.round(num(requestedAmount.value));
+    if(total<=0){
+      availableDirectLine.textContent='—';
+      availableOtherLine.textContent='—';
+      return;
+    }
+    const {deptOver, fundCov, used, direct} = calcWithDerivedShare(total);
     availableDirectLine.textContent = fmt(direct);
-    directWarn.classList.toggle('hidden', direct > 0);
-    const sal = Math.round(cleanNum(existingSalaries.value));
-    if (sal > direct) existingSalaries.value = fmt(direct);
+
+    // clamp and compute "other" live
+    clampSalaryInputs(direct);
+    const planned = Math.max(0, Math.round(num(plannedSalaryDirect.value)));
+    const otherLive = Math.max(0, direct - planned);
+    availableOtherLine.textContent = fmt(otherLive);
   }
 
-  function toggleFunderFields(){
-    const type = [...funderTypeRadios].find(r=>r.checked)?.value || 'percent';
-    funderPercentBox.classList.toggle('hidden', type !== 'percent');
-    funderAbsoluteBox.classList.toggle('hidden', type !== 'absolute');
-  }
-
-  function label2Lines(lbl, val){
-    return val > 0 ? `${lbl}<br>${fmt(val)}` : '';
-  }
+  // ---------- Calculate & render
+  function labelAmount(val){ return val>0 ? fmt(val) : ''; }
 
   function calculate(){
-    const total = Math.round(cleanNum(requestedAmount.value));
-    const deptP = cleanNum(deptOverheadPercent.value);
+    const total=Math.round(num(requestedAmount.value));
+    const years = projectYears.value || '1';
+    const {deptOver, fundCov, used, direct, rEff, share} = calcWithDerivedShare(total);
 
-    const deptOver   = getDeptOverhead(total);
-    const fundOver   = getFunderOverhead(total);
+    const coFinRaw = Math.max(0, deptOver - used);
+    const {amount:facUsed, note:facNote} = ufFromScheme(total, years, coFinRaw);
+    const coFinNet = Math.max(0, coFinRaw - facUsed);
 
-    let coverageUsed = 0, finalDirect = 0, coFin = deptOver;
-    if (fundOver <= 0){
-      finalDirect = total;
-      coverageUsed = 0;
-      coFin = deptOver;
-    } else {
-      coverageUsed = Math.min(deptOver, fundOver);
-      finalDirect  = Math.max(0, total - coverageUsed);
-      coFin        = Math.max(0, deptOver - coverageUsed);
-    }
+    // Clamp again before computing breakdown
+    clampSalaryInputs(direct);
+    const plannedSal = Math.max(0, Math.round(num(plannedSalaryDirect.value)));
+    const userSalaries = Math.max(0, Math.round(num(existingSalaries.value)));
+    const other = Math.max(0, direct - plannedSal);
 
-    let userSalaries = Math.round(cleanNum(existingSalaries.value));
-    userSalaries = clamp(userSalaries, 0, finalDirect);
-    if (userSalaries !== Math.round(cleanNum(existingSalaries.value))){
-      existingSalaries.value = fmt(userSalaries);
-    }
+    let cls='warn', txt='UNCLEAR cost-benefit advantage';
+    let expl=`Dept co-finance after Univ/Faculty (${fmt(coFinNet)}) is greater than existing-salary coverage (${fmt(userSalaries)}).`;
+    if(userSalaries>coFinNet){ cls='ok'; txt='CLEAR cost-benefit advantage'; expl=`Existing-salary coverage (${fmt(userSalaries)}) exceeds dept co-finance after Univ/Faculty (${fmt(coFinNet)}).`; }
+    else if(userSalaries===coFinNet){ cls='warn'; txt='BREAK-EVEN'; expl=`Existing-salary coverage equals dept co-finance after Univ/Faculty (${fmt(coFinNet)}).`; }
 
-    let other = Math.max(0, finalDirect - userSalaries);
-
-    // Evaluation
-    let tagClass = 'warn';
-    let tagText = 'UNCLEAR cost-benefit advantage';
-    let explanation = `Co-financing (${fmt(coFin)}) is greater than existing-salary coverage (${fmt(userSalaries)}).`;
-    if (userSalaries > coFin){
-      tagClass = 'ok';
-      tagText = 'CLEAR cost-benefit advantage';
-      explanation = `Existing-salary coverage (${fmt(userSalaries)}) exceeds co-financing (${fmt(coFin)}).`;
-    } else if (userSalaries === coFin){
-      tagClass = 'warn';
-      tagText = 'BREAK-EVEN';
-      explanation = `Existing-salary coverage equals co-financing (${fmt(coFin)}).`;
-    }
-
-    resultTag.className = `tag ${tagClass}`;
-    resultTag.textContent = tagText;
-    resultExplanation.textContent = explanation;
+    resultTag.className='tag '+cls; resultTag.textContent=txt; resultExplanation.textContent=expl;
     resultContainer.classList.remove('hidden');
 
-    const sumSeg = coverageUsed + other + userSalaries + coFin;
-    if (sumSeg <= 0){
-      barContainer.classList.add('hidden');
-    } else {
-      barContainer.classList.remove('hidden');
-      const frac = (x)=> x>0 ? x/sumSeg : 0;
-      bars.overhead.style.flex = String(frac(coverageUsed));
-      bars.other.style.flex    = String(frac(other));
-      bars.salary.style.flex   = String(frac(userSalaries));
-      bars.cofin.style.flex    = String(frac(coFin));
+    // Render bar amounts-only + legend
+    const sum=used+other+userSalaries+facUsed+coFinNet;
+    if(sum<=0){ barContainer.classList.add('hidden'); legend.classList.add('hidden'); }
+    else{
+      barContainer.classList.remove('hidden'); legend.classList.remove('hidden');
+      const frac=x=>x>0?x/sum:0;
+      bars.overhead.style.flex=String(frac(used));
+      bars.other.style.flex=String(frac(other));
+      bars.salary.style.flex=String(frac(userSalaries));
+      bars.fac.style.flex=String(frac(facUsed));
+      bars.cofin.style.flex=String(frac(coFinNet));
 
-      bars.overhead.innerHTML = label2Lines('Indirect', coverageUsed);
-      bars.other.innerHTML    = label2Lines('Other costs', other);
-      bars.salary.innerHTML   = label2Lines('Ex. salaries', userSalaries);
-      bars.cofin.innerHTML    = label2Lines('Co-finance', coFin);
+      // numbers only on bars
+      bars.overhead.textContent = labelAmount(used);
+      bars.other.textContent    = labelAmount(other);
+      bars.salary.textContent   = labelAmount(userSalaries);
+      bars.fac.textContent      = labelAmount(facUsed);
+      bars.cofin.textContent    = labelAmount(coFinNet);
     }
 
-    numbersDump.innerHTML = [
-      `Requested: ${fmt(total)}`,
-      `Dept overhead %: ${isFinite(deptP)?deptP:0}`,
-      `Dept overhead (calc): ${fmt(deptOver)}`,
-      `Funder overhead (entered/calc): ${fmt(fundOver)}`,
-      `Coverage used (min dept,funder): ${fmt(coverageUsed)}`,
-      `Final direct: ${fmt(finalDirect)}`,
-      `Existing salaries (used): ${fmt(userSalaries)}`,
+    const modeLabel = (activeScheme.funder.mode==='percent_overhead') ? '% of overhead'
+                     : (activeScheme.funder.mode==='percent_total')    ? '% of total (cascading)'
+                     : (activeScheme.funder.mode==='absolute')         ? 'absolute amount'
+                     : 'none';
+
+    numbersDump.innerHTML=[
+      `Scheme: ${schemeSelect.options[schemeSelect.selectedIndex].text}`,
+      `Amount to Applied IT: ${fmt(total)}`,
+      `Project duration: ${years} year(s)`,
+      `OH policy: salaries ${ohSalaryRate.value}% | other ${ohOtherRate.value}%`,
+      `Dept overhead (cascading): ${fmt(deptOver)}`,
+      `Funder coverage: ${fmt(getFunderCoverage(total, deptOver))} (${modeLabel})`,
+      `Coverage used (min dept,funder): ${fmt(used)}`,
+      `Direct funds available: ${fmt(direct)}`,
+      `Planned salary (direct): ${fmt(plannedSal)}`,
+      `Existing salaries (subset): ${fmt(userSalaries)}`,
       `Other direct: ${fmt(other)}`,
-      `Co-finance: ${fmt(coFin)}`
+      `Dept co-finance before Univ/Fac: ${fmt(coFinRaw)}`,
+      `Univ/Fac co-funding (applied): ${fmt(facUsed)}${facNote?` — ${facNote}`:''}`,
+      `Dept co-finance after Univ/Fac: ${fmt(coFinNet)}`
     ].join('<br>');
   }
 
   function resetAll(){
-    [deptOverheadPercent, requestedAmount, funderPercent, funderAbsolute, existingSalaries].forEach(i=>i.value='');
-    availableDirectLine.textContent = '–';
-    resultContainer.classList.add('hidden');
-    barContainer.classList.add('hidden');
-    toggleFunderFields();
+    requestedAmount.value=''; projectYears.value='';
+    schemeSelect.value='custom'; applyScheme();
+    funderModeSelect.value='percent_overhead';
+    funderPercentOverhead.value=''; funderOverheadAbsolute.value=''; funderOverheadPercent.value='';
+    plannedSalaryDirect.value=''; existingSalaries.value='';
+    ohSalaryRate.value='62'; ohOtherRate.value='52';
+    $('availableDirectLine').textContent='—'; $('availableOtherLine').textContent='—';
+    resultContainer.classList.add('hidden'); barContainer.classList.add('hidden'); legend.classList.add('hidden');
+    lastShare=0.5;
   }
 
-  // ---------- Events ----------
-  ['input','blur'].forEach(evt=>{
-    deptOverheadPercent.addEventListener(evt, updateAvailableDirect);
-    requestedAmount.addEventListener(evt, updateAvailableDirect);
-    funderPercent.addEventListener(evt, updateAvailableDirect);
-    funderAbsolute.addEventListener(evt, updateAvailableDirect);
-    existingSalaries.addEventListener(evt, updateAvailableDirect);
-  });
-  funderTypeRadios.forEach(r=>r.addEventListener('change', ()=>{toggleFunderFields(); updateAvailableDirect()}));
-  document.getElementById('calcBtn').addEventListener('click', calculate);
-  document.getElementById('resetBtn').addEventListener('click', resetAll);
+  // ---------- event wiring
+  function attachLogicListeners(){
+    funderModeSelect.addEventListener('change', ()=>{toggleFunderInputs(); updateLive();});
+    schemeSelect.addEventListener('change', applyScheme);
+    $('calcBtn').addEventListener('click', calculate);
+    $('resetBtn').addEventListener('click', resetAll);
+  }
 
   // init
-  toggleFunderFields();
-  updateAvailableDirect();
+  attachFormatters();
+  attachLogicListeners();
+  applyScheme();
+  updateLive();
 </script>
 </body>
 </html>
