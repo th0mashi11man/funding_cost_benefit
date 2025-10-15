@@ -4,11 +4,11 @@
 GUIDE FOR CONFIG.JSON
 ───────────────────────────────────────────────────────────────
 
-This file defines the overhead policy, list of funders, and how
+The config.json file defines the overhead policy, list of funders, and how
 University and Faculty co-funding is applied in the calculator.
 
 The calculator automatically reads this file when it loads from
-the same directory as index.html on GitHub Pages.
+the same directory as index.html
 
 ───────────────────────────────────────────────────────────────
 1) OVERHEAD POLICY
