@@ -94,9 +94,9 @@ Available modes:
    { \"name\": \"Vice Chancellor\", \"mode\": \"fixed_per_year\",
      \"amount_per_year\": 750000, \"notes\": \"VC 750k/yr\" }
 
-───────────────────────────────────────────────────────────────
+
 3C) ORDER AND THE 'OTHER' SCHEME
-───────────────────────────────────────────────────────────────
+
 • Normal schemes appear in the order listed.
 • The special 'Other' scheme is automatically shown last and allows users
   to type custom coverage values in the UI.
