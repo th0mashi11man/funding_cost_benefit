@@ -1,18 +1,14 @@
 # This simple javascript tool performs a basic cost-benefit analysis on external research funding
 
-───────────────────────────────────────────────────────────────
-GUIDE FOR CONFIG.JSON
-───────────────────────────────────────────────────────────────
-
 The config.json file defines the overhead policy, list of funders, and how
 University and Faculty co-funding is applied in the calculator.
 
 The calculator automatically reads this file when it loads from
 the same directory as index.html
 
-───────────────────────────────────────────────────────────────
+
 1) OVERHEAD POLICY
-───────────────────────────────────────────────────────────────
+
 The 'overhead' section defines the department's default indirect
 cost (overhead) rates, for information and internal calculations.
 
@@ -27,17 +23,17 @@ Example:
 • salary_percent – overhead % on salary costs
 • other_percent – overhead % on other costs
 
-───────────────────────────────────────────────────────────────
-2) DEFAULT SCHEME
-───────────────────────────────────────────────────────────────
+
+2) DEFAULT FUNDING SCHEME
+
   \"defaultScheme\": \"vr\"
 
 Determines which scheme is selected by default when the page loads.
 The value must match one of the 'id' entries under 'schemes'.
 
-───────────────────────────────────────────────────────────────
+
 3) ADDING OR EDITING FUNDERS / GRANT SCHEMES
-───────────────────────────────────────────────────────────────
+
 Each grant scheme is listed as an object in the 'schemes' array:
 
   {
@@ -47,9 +43,9 @@ Each grant scheme is listed as an object in the 'schemes' array:
     \"uf_rules\": [ ... ]
   }
 
-───────────────────────────────────────────────────────────────
+
 3A) FUNDER OBJECT
-───────────────────────────────────────────────────────────────
+
 The 'funder' object defines how the funding body covers indirect costs.
 
 Choose ONE of the following modes:
@@ -73,9 +69,8 @@ Choose ONE of the following modes:
 5. \"manual\" – reserved for the 'Other' scheme (user enters values manually).
    Example: { \"mode\": \"manual\", \"value\": null, \"label\": \"Manual entry\" }
 
-───────────────────────────────────────────────────────────────
 3B) UNIVERSITY / FACULTY (UF) CONTRIBUTION RULES
-───────────────────────────────────────────────────────────────
+
 Each funder may include one or more university/faculty co-funding rules
 under 'uf_rules'.  If there is none, set it to an empty array: [].
 
@@ -114,18 +109,18 @@ Available modes:
       \"uf_rules\": []
     }
 
-───────────────────────────────────────────────────────────────
+
 4) VALIDATION AND BEST PRACTICES
-───────────────────────────────────────────────────────────────
+
 • Every 'id' must be unique.
 • 'defaultScheme' must match one of those ids.
 • Numeric fields must not contain percent signs or commas.
 • If a scheme has no university/faculty contributions, use \"uf_rules\": [].
 • 'label' and 'notes' fields are for display text only.
 
-───────────────────────────────────────────────────────────────
+
 5) QUICK EXAMPLES
-───────────────────────────────────────────────────────────────
+
 A) Funder covers all overhead, no university/faculty contribution:
   {
     \"id\": \"vr\",
