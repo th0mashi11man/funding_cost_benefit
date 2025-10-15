@@ -127,7 +127,7 @@
     {
       "id": "horizon",
       "name": "EU – Horizon",
-      "funder": { "mode": "percent_overhead", "value": 25, "label": "Up to 25% for indirect costs" },
+      "funder": { "mode": "percent_total", "value": 25, "label": "Up to 25% for indirect costs" },
       "uf_rules": []
     },
     {
