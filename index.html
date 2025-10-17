@@ -39,6 +39,14 @@
   .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#0b1330;border:1px solid var(--border);color:#9fb0c7;font-size:.9rem}
   .hidden{display:none}
   .error{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.35);color:#ff9b9b}
+
+  /* Pedagogical details view */
+  .details-grid{display:grid;gap:10px}
+  @media (min-width:820px){.details-grid.cols-2{grid-template-columns:1fr 1fr}}
+  .kv{display:grid;grid-template-columns:1fr auto;gap:6px 12px;padding:10px;border:1px solid var(--border);border-radius:10px;background:#0b1330}
+  .kv .k{color:var(--muted)}
+  .kv .v{font-weight:700}
+  .section-title{margin:12px 0 6px;font-weight:800;color:#cfe2f5}
 </style>
 </head>
 <body>
@@ -354,7 +362,7 @@
     funderPercentTotalBox.classList.toggle('hidden', !(isOther && mode==='percent_total'));
   }
 
-  // UPDATED: omit "Univ/Faculty: none..." when no uf_rules
+  // omit "Univ/Faculty: none..." when no uf_rules
   function applyScheme(){
     const id = schemeSelect.value;
     activeScheme = SCHEMES[id];
@@ -392,6 +400,58 @@
     const planned = Math.max(0, Math.round(num(plannedSalaryDirect.value)));
     const otherLive = Math.max(0, direct - planned);
     availableOtherLine.textContent = fmt(otherLive);
+  }
+
+  // ---------- Pedagogical renderer for details
+  function renderCalcDetails(d){
+    const row = (label, val, suffix='') =>
+      (val>0 || val==='—')
+        ? `<div class="k">${label}</div><div class="v mono">${val==='—' ? '—' : fmt(val)}${suffix}</div>`
+        : '';
+    const text = (label, val) =>
+        `<div class="k">${label}</div><div class="v">${val}</div>`;
+
+    const hasUF = d.ufApplied && d.ufApplied > 0;
+
+    return `
+    <div class="details-grid cols-2">
+
+      <div>
+        <div class="section-title">Inputs</div>
+        <div class="kv">
+          ${text('Grant scheme', d.scheme)}
+          ${row('Amount for Applied IT', d.total)}
+          ${text('Project duration', `${d.years} year(s)`)}
+          ${text('Overhead policy', `salaries ${d.salaryOH}% · other costs ${d.otherOH}%`)}
+        </div>
+
+        <div class="section-title">Indirect costs & coverage</div>
+        <div class="kv">
+          ${row('Department overhead (cascading)', d.deptOver)}
+          ${row('Funder indirect coverage', d.funderCoverage, ` <span class="help" style="font-weight:600;">(${d.funderModeLabel})</span>`)}
+          ${row('Coverage used (min of dept/funder)', d.used)}
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">Direct costs</div>
+        <div class="kv">
+          ${row('Direct funds available', d.direct)}
+          ${row('Planned salary costs', d.plannedSal)}
+          ${row('…of which existing staff salaries', d.userSalaries)}
+          ${row('Other direct costs', d.other)}
+        </div>
+
+        <div class="section-title">Co-financing & verdict</div>
+        <div class="kv">
+          ${row('Dept co-financing before Univ/Faculty', d.coFinRaw)}
+          ${hasUF ? row('Univ/Faculty contribution (applied)', d.ufApplied, d.ufNote ? ` — <span class="help">${d.ufNote}</span>` : '') : ''}
+          ${row('Department co-financing cost after Univ/Faculty contribution', d.coFinNet)}
+        </div>
+      </div>
+
+    </div>
+    `;
   }
 
   // ---------- Calculate & render (zero-value categories hidden)
@@ -468,22 +528,25 @@
                      : (activeScheme.funder.mode==='manual')           ? 'manual'
                      : 'none';
 
-    numbersDump.innerHTML=[
-      `Scheme: ${schemeSelect.options[schemeSelect.selectedIndex].text}`,
-      `Amount for Applied IT: ${fmt(total)}`,
-      `Project duration: ${years} year(s)`,
-      `OH policy: salaries ${(salaryOH*100).toFixed(0)}% | other costs ${(otherOH*100).toFixed(0)}%`,
-      `Dept overhead (cascading): ${fmt(deptOver)}`,
-      `Funder coverage: ${fmt(getFunderCoverage(total, deptOver))} (${modeLabel})`,
-      `Coverage used (min dept,funder): ${fmt(used)}`,
-      `Direct funds available: ${fmt(direct)}`,
-      `Planned salary costs: ${fmt(plannedSal)}`,
-      `…of which existing staff salaries: ${fmt(userSalaries)}`,
-      `Other direct: ${fmt(other)}`,
-      `Dept co-finance before Univ/Fac: ${fmt(coFinRaw)}`,
-      (ufAgg.amount>0 ? `Univ/Fac contribution (applied): ${fmt(facUsed)} — ${ufAgg.note}` : `Univ/Fac contribution (applied): ${fmt(facUsed)}`),
-      `Department co-financing cost after Univ/Faculty contribution: ${fmt(coFinNet)}`
-    ].join('<br>');
+    numbersDump.innerHTML = renderCalcDetails({
+      scheme: schemeSelect.options[schemeSelect.selectedIndex].text,
+      total,
+      years,
+      salaryOH: (salaryOH*100).toFixed(0),
+      otherOH: (otherOH*100).toFixed(0),
+      deptOver,
+      funderCoverage: getFunderCoverage(total, deptOver),
+      funderModeLabel: modeLabel,
+      used,
+      direct,
+      plannedSal,
+      userSalaries,
+      other,
+      coFinRaw,
+      ufApplied: facUsed,
+      ufNote: ufAgg.note,
+      coFinNet
+    });
   }
 
   function resetAll(){
