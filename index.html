@@ -402,7 +402,7 @@
     availableOtherLine.textContent = fmt(otherLive);
   }
 
-  // ---------- Pedagogical renderer for details (UF moved to Indirect; final box renamed)
+  // ---------- Pedagogical renderer (UF shown under Indirect; final box single line)
   function renderCalcDetails(d){
     const row = (label, val, suffix='') =>
       (val>0 || val===0 || val==='—')
@@ -441,8 +441,7 @@
 
         <div class="section-title">Departmental co-financing needed</div>
         <div class="kv">
-          ${row('Dept co-financing before Univ/Faculty', d.coFinRaw)}
-          ${row('Department co-financing cost after Univ/Faculty contribution', d.coFinNet)}
+          ${row('Departmental co-financing needed', d.coFinNet)}
         </div>
       </div>
 
@@ -450,7 +449,7 @@
     `;
   }
 
-  // ---------- Calculate & render (zero-value categories hidden in bar; details show zeros where required)
+  // ---------- Calculate & render (hide zero-value bars; details show zeros where required)
   function labelAmount(val){ return val>0 ? fmt(val) : ''; }
   function calculate(){
     const total=Math.round(num(requestedAmount.value));
@@ -509,7 +508,7 @@
       setSeg(bars.cofin,    document.getElementById('leg-cofin'), vals.coFinNet);
     }
 
-    // Build details (no bracketed notes)
+    // Build details
     numbersDump.innerHTML = renderCalcDetails({
       scheme: schemeSelect.options[schemeSelect.selectedIndex].text,
       total,
@@ -520,9 +519,8 @@
       plannedSal,
       userSalaries,
       other,
-      coFinRaw,
-      ufApplied: facUsed,
-      coFinNet
+      coFinNet,
+      ufApplied: facUsed
     });
   }
 
