@@ -93,7 +93,7 @@
         <select id="funderModeSelect">
           <option value="percent_overhead" selected>% of overhead</option>
           <option value="absolute">Fixed amount</option>
-          <option value="percent_total">% of total (cascading)</option>
+          <option value="percent_total">% of total</option>
         </select>
       </div>
       <div id="funderPercentOverBox">
@@ -105,7 +105,7 @@
         <input id="funderOverheadAbsolute" data-decimal="false" inputmode="numeric" placeholder="e.g., 150 000"/>
       </div>
       <div id="funderPercentTotalBox" class="hidden">
-        <label for="funderOverheadPercent">Coverage (% of total, cascading)</label>
+        <label for="funderOverheadPercent">Coverage (% of total)</label>
         <input id="funderOverheadPercent" data-decimal="true" placeholder="e.g., 25"/>
       </div>
     </div>
@@ -402,7 +402,7 @@
     availableOtherLine.textContent = fmt(otherLive);
   }
 
-  // ---------- Pedagogical renderer for details (updated per your request)
+  // ---------- Pedagogical renderer for details (UF moved to Indirect; final box renamed)
   function renderCalcDetails(d){
     const row = (label, val, suffix='') =>
       (val>0 || val===0 || val==='—')
@@ -410,8 +410,6 @@
         : '';
     const text = (label, val) =>
         `<div class="k">${label}</div><div class="v">${val}</div>`;
-
-    const ufSuffix = d.ufNote ? ` — <span class="help">${d.ufNote}</span>` : '';
 
     return `
     <div class="details-grid cols-2">
@@ -428,6 +426,7 @@
         <div class="kv">
           ${row('Department overhead (cascading)', d.deptOver)}
           ${row('Funder indirect coverage', d.funderCoverage)}
+          ${d.ufApplied>0 ? row('Univ/Faculty contribution', d.ufApplied) : ''}
         </div>
       </div>
 
@@ -440,10 +439,9 @@
           ${row('Other direct costs', d.other)}
         </div>
 
-        <div class="section-title">Co-financing needed</div>
+        <div class="section-title">Departmental co-financing needed</div>
         <div class="kv">
           ${row('Dept co-financing before Univ/Faculty', d.coFinRaw)}
-          ${row('Univ/Faculty contribution (applied)', d.ufApplied, ufSuffix)}
           ${row('Department co-financing cost after Univ/Faculty contribution', d.coFinNet)}
         </div>
       </div>
@@ -452,7 +450,7 @@
     `;
   }
 
-  // ---------- Calculate & render (zero-value categories hidden in bar; details show zeros)
+  // ---------- Calculate & render (zero-value categories hidden in bar; details show zeros where required)
   function labelAmount(val){ return val>0 ? fmt(val) : ''; }
   function calculate(){
     const total=Math.round(num(requestedAmount.value));
@@ -467,7 +465,7 @@
     const userSalaries = Math.max(0, Math.round(num(existingSalaries.value)));
     const other = Math.max(0, direct - plannedSal);
 
-    // Result tag/explanation (kept above details; nothing inside the Co-financing box)
+    // Verdict tag/explanation (kept above details)
     let cls='warn', txt='UNCLEAR cost-benefit advantage';
     let expl=`Department co-financing cost after Univ/Faculty contribution (${fmt(coFinNet)}) is greater than coverage of existing-salary costs (${fmt(userSalaries)}).`;
     if(userSalaries>coFinNet){
@@ -480,7 +478,7 @@
     resultTag.className='tag '+cls; resultTag.textContent=txt; resultExplanation.textContent=expl;
     resultContainer.classList.remove('hidden');
 
-    // Build segments & legend visibility (hide zero-value segments)
+    // Bar segments & legend (hide zeros)
     const vals = { used, other, userSalaries, facUsed, coFinNet };
     const sum = Object.values(vals).reduce((a,b)=>a+b,0);
 
@@ -511,29 +509,19 @@
       setSeg(bars.cofin,    document.getElementById('leg-cofin'), vals.coFinNet);
     }
 
-    // We still compute modeLabel for internal use, but do not show bracketed notes in details
-    const modeLabel = (activeScheme.funder.mode==='percent_overhead') ? '% of overhead'
-                     : (activeScheme.funder.mode==='percent_total')    ? '% of total'
-                     : (activeScheme.funder.mode==='absolute')         ? 'absolute amount'
-                     : (activeScheme.funder.mode==='manual')           ? 'manual'
-                     : 'none';
-
+    // Build details (no bracketed notes)
     numbersDump.innerHTML = renderCalcDetails({
       scheme: schemeSelect.options[schemeSelect.selectedIndex].text,
       total,
       years,
       deptOver,
       funderCoverage: getFunderCoverage(total, deptOver),
-      // no bracketed notes here:
-      funderModeLabel: modeLabel,
-      used,
       direct,
       plannedSal,
       userSalaries,
       other,
       coFinRaw,
       ufApplied: facUsed,
-      ufNote: ufAgg.note,
       coFinNet
     });
   }
@@ -594,7 +582,7 @@
     (CONFIG.schemes||[]).forEach(s=>{
       SCHEMES[s.id] = { name:s.name, funder:s.funder||{mode:'none',value:0,label:'—'}, uf_rules:Array.isArray(s.uf_rules)?s.uf_rules:[] };
     });
-    if(!SCHEMES['other']) SCHEMES['other'] = { name:'Other', funder:{mode:'manual',value:null,label:'Manual entry'}, uf_rules:[] };
+    if(!SCHEMES['other']) SCHEMES['other'] = { name:'Other', funder:{mode:'manual',value:null, label:'Manual entry'}, uf_rules:[] };
 
     // page title
     pageTitle.textContent = CONFIG.title || "Research Funding Financial Cost-Benefit Calculator";
