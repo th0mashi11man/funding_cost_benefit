@@ -140,12 +140,14 @@
         <div class="seg s-fac"   id="facBar"></div>
         <div class="seg s-cof"   id="cofinBar"></div>
       </div>
+
+      <!-- Legend with IDs so zero-value categories can be hidden -->
       <div class="legend hidden" id="legend">
-        <span class="legend-item"><span class="legend-swatch" style="background:var(--gold)"></span>Indirect (funder)</span>
-        <span class="legend-item"><span class="legend-swatch" style="background:var(--green)"></span>Other direct</span>
-        <span class="legend-item"><span class="legend-swatch" style="background:var(--blue)"></span>Existing salaries</span>
-        <span class="legend-item"><span class="legend-swatch" style="background:var(--purple)"></span>Univ/Fac contribution</span>
-        <span class="legend-item"><span class="legend-swatch" style="background:var(--red)"></span>Dept co-financing</span>
+        <span class="legend-item" id="leg-over"><span class="legend-swatch" style="background:var(--gold)"></span>Indirect (funder)</span>
+        <span class="legend-item" id="leg-other"><span class="legend-swatch" style="background:var(--green)"></span>Other direct</span>
+        <span class="legend-item" id="leg-salary"><span class="legend-swatch" style="background:var(--blue)"></span>Existing salaries</span>
+        <span class="legend-item" id="leg-fac"><span class="legend-swatch" style="background:var(--purple)"></span>Univ/Fac contribution</span>
+        <span class="legend-item" id="leg-cofin"><span class="legend-swatch" style="background:var(--red)"></span>Dept co-financing</span>
       </div>
 
       <details>
@@ -392,7 +394,7 @@
     availableOtherLine.textContent = fmt(otherLive);
   }
 
-  // ---------- Calculate & render
+  // ---------- Calculate & render (zero-value categories hidden)
   function labelAmount(val){ return val>0 ? fmt(val) : ''; }
   function calculate(){
     const total=Math.round(num(requestedAmount.value));
@@ -407,35 +409,57 @@
     const userSalaries = Math.max(0, Math.round(num(existingSalaries.value)));
     const other = Math.max(0, direct - plannedSal);
 
+    // Result tag/explanation
     let cls='warn', txt='UNCLEAR cost-benefit advantage';
     let expl=`Department co-financing cost after Univ/Faculty contribution (${fmt(coFinNet)}) is greater than coverage of existing-salary costs (${fmt(userSalaries)}).`;
     if(userSalaries>coFinNet){
       cls='ok'; txt='CLEAR cost-benefit advantage';
       expl=`Coverage of existing-salary costs (${fmt(userSalaries)}) exceeds department co-financing cost after Univ/Faculty contribution (${fmt(coFinNet)}).`;
-    }
-    else if(userSalaries===coFinNet){
+    } else if(userSalaries===coFinNet){
       cls='warn'; txt='BREAK-EVEN';
       expl=`Coverage of existing-salary costs equals department co-financing cost after Univ/Faculty contribution (${fmt(coFinNet)}).`;
     }
-
     resultTag.className='tag '+cls; resultTag.textContent=txt; resultExplanation.textContent=expl;
     resultContainer.classList.remove('hidden');
 
-    const sum=used+other+userSalaries+facUsed+coFinNet;
-    if(sum<=0){ barContainer.classList.add('hidden'); legend.classList.add('hidden'); }
-    else{
-      barContainer.classList.remove('hidden'); legend.classList.remove('hidden');
-      const frac=x=>x>0?x/sum:0;
-      bars.overhead.style.flex=String(frac(used));
-      bars.other.style.flex=String(frac(other));
-      bars.salary.style.flex=String(frac(userSalaries));
-      bars.fac.style.flex=String(frac(facUsed));
-      bars.cofin.style.flex=String(frac(coFinNet));
-      bars.overhead.textContent = labelAmount(used);
-      bars.other.textContent    = labelAmount(other);
-      bars.salary.textContent   = labelAmount(userSalaries);
-      bars.fac.textContent      = labelAmount(facUsed);
-      bars.cofin.textContent    = labelAmount(coFinNet);
+    // Build segments & legend visibility
+    const vals = {
+      used,          // Indirect (funder)
+      other,         // Other direct
+      userSalaries,  // Existing salaries
+      facUsed,       // Univ/Fac contribution
+      coFinNet       // Dept co-financing
+    };
+    const sum = Object.values(vals).reduce((a,b)=>a+b,0);
+
+    if(sum<=0){
+      barContainer.classList.add('hidden');
+      legend.classList.add('hidden');
+    } else {
+      barContainer.classList.remove('hidden');
+      legend.classList.remove('hidden');
+
+      const frac = x => x>0 ? x/sum : 0;
+
+      // helper to show/hide a bar segment + legend item together
+      function setSeg(barEl, legEl, val){
+        if(val>0){
+          barEl.style.display = 'flex';
+          barEl.style.flex = String(frac(val));
+          barEl.textContent = fmt(val);
+          if(legEl) legEl.style.display = 'inline-flex';
+        } else {
+          barEl.style.display = 'none';
+          barEl.textContent = '';
+          if(legEl) legEl.style.display = 'none';
+        }
+      }
+
+      setSeg(bars.overhead, document.getElementById('leg-over'),  vals.used);
+      setSeg(bars.other,    document.getElementById('leg-other'), vals.other);
+      setSeg(bars.salary,   document.getElementById('leg-salary'),vals.userSalaries);
+      setSeg(bars.fac,      document.getElementById('leg-fac'),   vals.facUsed);
+      setSeg(bars.cofin,    document.getElementById('leg-cofin'), vals.coFinNet);
     }
 
     const modeLabel = (activeScheme.funder.mode==='percent_overhead') ? '% of overhead'
