@@ -1,9 +1,9 @@
 {
   "title": "Applied IT Research Funding Financial Cost-Benefit Calculator",
   "overhead": {
-    "label": "2025",
-    "salary_percent": 62,
-    "other_percent": 52
+    "label": "2026",
+    "salary_percent": 54,
+    "other_percent": 45
   },
   "defaultScheme": "vr",
 
