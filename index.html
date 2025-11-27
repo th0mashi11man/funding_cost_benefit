@@ -82,7 +82,7 @@
     <label for="schemeSelect">1. Select grant scheme</label>
     <select id="schemeSelect"></select>
     <div class="help" id="schemeInfo" style="margin-top:6px">
-      Start by choosing the grant scheme. The calculator will then show only the fields relevant for that scheme.
+      Start by choosing the grant scheme. If it isn't listed, choose Other.
     </div>
   </div>
 
@@ -209,7 +209,7 @@
   const RJ_TOPUP_PER_FTE_YEAR = 170000;
 
   // Parse numbers that may include spaces, comma/dot decimals
-  const num = (s)=>{
+  function num(s){
     if(!s) return 0;
     const t=String(s);
     let u=t.replace(/[^\d.,\s-]/g,'').trim();
@@ -227,7 +227,7 @@
     } else {
       return (neg?-1:1)*Number(u.replace(/[^\d]/g,'') || '0');
     }
-  };
+  }
 
   function formatNumericInput(el){
     const allowDecimal = el.getAttribute('data-decimal') === 'true';
@@ -264,7 +264,7 @@
   const clamp = (x,min,max)=>Math.max(min,Math.min(x,max));
 
   // ---------- elements
-  const pageTitle=$('pageTitle'), ohBadge=$('ohBadge'), configWarn=$('configWarn');
+  const ohBadge=$('ohBadge'), configWarn=$('configWarn');
 
   const projectSection = $('projectSection');
   const directSection = $('directSection');
@@ -339,14 +339,13 @@
       return Math.max(0, Math.round(capped));
     }
 
-    // per_fte_per_year is now handled as a project top-up for RJ, not as UF OH coverage
+    // per_fte_per_year is handled as project top-up, not UF OH coverage
     if(mode === 'per_fte_per_year'){
       return 0;
     }
 
-    // share of OH gap (deptOver minus funder coverage)
     if(mode === 'oh_gap_share'){
-      const share = Number(rule.value || 0) / 100; // 0–1
+      const share = Number(rule.value || 0) / 100;
       const base = Math.max(0, Number(coFinRaw || 0));
       return Math.max(0, Math.round(base * share));
     }
@@ -356,18 +355,17 @@
 
   function sumUfAmount(rules, total, years, deptOver, coFinRaw){
     if(!Array.isArray(rules) || rules.length===0) return {amount:0, note:'', byName:{}};
-    let sum=0, notes=[];
+    let sum=0;
     const byName = {};
     for(const r of rules){
-      if(r.mode === 'per_fte_per_year') continue; // RJ top-up handled separately
+      if(r.mode === 'per_fte_per_year') continue;
       const a = computeUfAmount(r, total, years, deptOver, coFinRaw);
       sum += a;
-      notes.push(r.notes || r.name || r.mode);
       if(r.name){
         byName[r.name] = (byName[r.name] || 0) + a;
       }
     }
-    return {amount: sum, note: notes.join(' + '), byName};
+    return {amount: sum, note:'', byName};
   }
 
   // ---------- salary clamping
@@ -380,19 +378,19 @@
 
   // ---------- core math
   function getFunderCoverage(total, deptOver){
-    if(!activeScheme) return 0;
+    if(!activeScheme || !activeScheme.funder) return 0;
     const mode = activeScheme.funder.mode;
     if(mode==='percent_overhead'){
-      const p = activeScheme.funder.value ?? num(funderPercentOverhead.value);
+      const p = (activeScheme.funder.value != null ? activeScheme.funder.value : num(funderPercentOverhead.value));
       return Math.round(deptOver * Math.max(0, Math.min(p,100)) / 100);
     }
     if(mode==='percent_total'){
-      const p = activeScheme.funder.value ?? num(funderOverheadPercent.value);
+      const p = (activeScheme.funder.value != null ? activeScheme.funder.value : num(funderOverheadPercent.value));
       const dec = Math.max(0, Math.min(p,500))/100;
       return Math.round(total * (dec/(1+dec)));
     }
     if(mode==='absolute'){
-      const a = activeScheme.funder.value ?? num(funderOverheadAbsolute.value);
+      const a = (activeScheme.funder.value != null ? activeScheme.funder.value : num(funderOverheadAbsolute.value));
       return Math.max(0, Math.min(Math.round(a), total));
     }
     if(mode==='manual'){
@@ -411,7 +409,7 @@
         return Math.round(total * (dec/(1+dec)));
       }
     }
-    return 0; // none
+    return 0;
   }
 
   function calcWithDerivedShare(total){
@@ -463,6 +461,69 @@
     calcSection.classList.toggle('hidden', !show);
   }
 
+  function describeScheme(sc){
+    if(!sc){
+      return 'Start by choosing the grant scheme. If it isn\'t listed, choose Other.';
+    }
+
+    const parts = [];
+
+    // Funder explanation
+    if(sc.funder && sc.funder.label){
+      parts.push(`<strong>Funder:</strong> ${sc.funder.label}.`);
+    }
+
+    // University / Faculty contributions
+    if (Array.isArray(sc.uf_rules) && sc.uf_rules.length) {
+      const uniLines = [];
+      const facLines = [];
+
+      sc.uf_rules.forEach(r => {
+        if (r.mode === "per_fte_per_year") return;
+
+        const note = r.notes || "";
+
+        // University (formerly Rektor)
+        if (r.name && r.name.toLowerCase().includes("rektor")) {
+          uniLines.push(
+            note
+              .replace(/^VC\s*/i, "")
+              .replace(/^Rektor\s*/i, "")
+          );
+        } 
+        // Faculty (formerly Faculty NT)
+        else if (r.name && r.name.toLowerCase().includes("faculty")) {
+          facLines.push(
+            note
+              .replace(/^Faculty\s*/i, "")
+              .replace(/\(nt\)/i, "")
+              .trim()
+          );
+        }
+      });
+
+      if (uniLines.length) {
+        parts.push(`<strong>University co-funding:</strong> ${uniLines.join(" ")}`);
+      }
+      if (facLines.length) {
+        parts.push(`<strong>Faculty co-funding:</strong> ${facLines.join(" ")}`);
+      }
+    }
+
+    // Scheme-specific clarifications
+    if(sc.id === 'horizon'){
+      parts.push('<strong>Special rule:</strong> All indirect costs on service purchases must be covered by the department.');
+    }
+    if(sc.id === 'rj_programme' || sc.id === 'rj_project'){
+      parts.push('<strong>Special rule:</strong> The 170 000 SEK per FTE and year is added on top of the RJ grant amount and does not reduce the requested amount from RJ.');
+    }
+    if(sc.id === 'kaw_project'){
+      parts.push('<strong>Note:</strong> Applies to KAW “Forskningsprojekt av hög vetenskaplig potential” with central co-funding subject to internal approval.');
+    }
+
+    return parts.join('<br>');
+  }
+
   function updateLive(){
     if(!activeScheme){
       availableDirectLine.textContent='—';
@@ -477,60 +538,6 @@
     availableOtherLine.textContent = fmt(other);
   }
 
-	function describeScheme(sc){
-  	  if(!sc){
-    	  return 'Start by choosing the grant scheme. If it isn't listed, choose other...';
-   	 }
-
-    	const parts = [];
-
-    	// Funder explanation
-    	if(sc.funder && sc.funder.label){
-      	parts.push(`<strong>Funder:</strong> ${sc.funder.label}.`);
-    	}
-
-    	// University / Faculty contributions
-    	if (Array.isArray(sc.uf_rules) && sc.uf_rules.length) {
-      	const uniLines = [];
-      	const facLines = [];
-
-      	sc.uf_rules.forEach(r => {
-        	// RJ top-ups are handled separately and should not appear here
-        	if (r.mode === "per_fte_per_year") return;
-
-        	const note = r.notes || "";
-
-        	// University
-        	if (r.name && r.name.toLowerCase().includes("rektor")) {
-          	uniLines.push(note.replace(/^VC\s*/i, "").replace(/^Rektor\s*/i, ""));
-        	} 
-
-        	// Faculty
-        	else if (r.name && r.name.toLowerCase().includes("faculty")) {
-          	facLines.push(note.replace(/^Faculty\s*/i, "").replace(/\(nt\)/i, "").trim());
-        	}
-      	});
-
-      	if (uniLines.length) {
-        	parts.push(`<strong>University co-funding:</strong> ${uniLines.join(" ")}`);
-      	}
-      	if (facLines.length) {
-        	parts.push(`<strong>Faculty co-funding:</strong> ${facLines.join(" ")}`);
-      	}
-    	}
-
-    	// Scheme-specific clarifications
-    	if(sc.id === 'horizon'){
-      	parts.push('<strong>Special rule:</strong> All indirect costs on service purchases must be covered by the department.');
-    	}
-    	if(sc.id === 'rj_programme' || sc.id === 'rj_project'){
-      	parts.push('<strong>Special rule:</strong> The 170 000 SEK per FTE and year is added on top of the RJ grant amount and does not reduce the requested amount from RJ.');
-    	}
-
-    	return parts.join('<br>');
-	}
-
-  
   function applyScheme(){
     const val = schemeSelect.value;
     if(!val){
@@ -557,9 +564,13 @@
     const row=(l,v)=> (v>0 || v===0) ? `<div class="k">${l}</div><div class="v mono">${fmt(v)}</div>` : '';
     const text=(l,v)=>`<div class="k">${l}</div><div class="v">${v}</div>`;
 
-    const rector = d.ufByName && d.ufByName['Rektor'] ? d.ufByName['Rektor'] : 0;
-    const faculty = d.ufByName && d.ufByName['Faculty (NT)'] ? d.ufByName['Faculty (NT)'] : 0;
-    const otherUF = d.ufByName ? Object.entries(d.ufByName).filter(([name])=>name!=='Rektor' && name!=='Faculty (NT)').reduce((acc,[,val])=>acc+val,0) : 0;
+    const rectorRaw   = d.ufByName && d.ufByName['Rektor'] ? d.ufByName['Rektor'] : 0;
+    const facultyRaw  = d.ufByName && d.ufByName['Faculty (NT)'] ? d.ufByName['Faculty (NT)'] : 0;
+    const otherUF = d.ufByName
+      ? Object.entries(d.ufByName)
+          .filter(([name])=>name!=='Rektor' && name!=='Faculty (NT)')
+          .reduce((acc,[,val])=>acc+val,0)
+      : 0;
 
     const isRJ = (d.schemeId === 'rj_programme' || d.schemeId === 'rj_project');
 
@@ -580,8 +591,8 @@
           ${row('Department overhead (cascading)', d.deptOver)}
           ${row('Funder indirect coverage', d.funderCoverage)}
           ${d.ufApplied>0 ? row('Univ/Faculty contribution (total)', d.ufApplied) : ''}
-          ${rector ? row('…of which Rektor', rector) : ''}
-          ${faculty ? row('…of which Faculty (NT)', faculty) : ''}
+          ${rectorRaw ? row('…of which University', rectorRaw) : ''}
+          ${facultyRaw ? row('…of which Faculty', facultyRaw) : ''}
           ${otherUF ? row('…other UF contributions', otherUF) : ''}
         </div>
       </div>
@@ -630,7 +641,7 @@
 
       const nonServiceOver = Math.max(0, deptOver - serviceOH);
 
-      // EU covers 25% of OH on non-service direct costs only
+      // EU covers configured share of OH on non-service costs
       funderCoverage = getFunderCoverage(effectiveTotal, nonServiceOver);
 
       const coveredNonService = Math.min(nonServiceOver, funderCoverage);
@@ -648,7 +659,7 @@
       // OH gap after UF on non-service costs
       coFinNetOH = Math.max(0, coFinRaw - ufApplied);
 
-      // For bar visualisation, we want total funder coverage on OH (only non-service part)
+      // For bar visualisation, funderCoverage is coverage on non-service OH only
       funderCoverage = coveredNonService;
     } else {
       funderCoverage = getFunderCoverage(effectiveTotal, deptOver);
@@ -786,23 +797,25 @@
 
   // ---------- config load + UI build
   async function loadConfig(){
-    const cacheBust = `?v=${Date.now()}`;
+    const cacheBust = '?v=' + Date.now();
     try{
       const res = await fetch('config.json'+cacheBust, { cache: 'no-store' });
       if(!res.ok) throw new Error('HTTP '+res.status);
       CONFIG = await res.json();
       configWarn.classList.add('hidden');
-      const lbl = CONFIG.overhead?.label || '';
-      const sal = CONFIG.overhead?.salary_percent ?? 0;
-      const oth = CONFIG.overhead?.other_percent ?? 0;
+
+      const oh = CONFIG.overhead || {};
+      const lbl = oh.label || '';
+      const sal = oh.salary_percent != null ? oh.salary_percent : 0;
+      const oth = oh.other_percent  != null ? oh.other_percent  : 0;
       salaryOH = sal/100;
       otherOH = oth/100;
       if(lbl){
-        ohBadge.textContent = `OH ${lbl}: salary ${sal}%, other ${oth}%`;
+        ohBadge.textContent = 'OH ' + lbl + ': salary ' + sal + '%, other ' + oth + '%';
         ohBadge.classList.remove('hidden');
       }
       SCHEMES = {};
-      for(const s of CONFIG.schemes){
+      for(const s of (CONFIG.schemes || [])){
         SCHEMES[s.id] = s;
       }
 
@@ -810,7 +823,7 @@
       const ph=document.createElement('option');
       ph.value=''; ph.textContent='Select grant scheme…'; ph.disabled=true; ph.selected=true;
       schemeSelect.appendChild(ph);
-      CONFIG.schemes.forEach(s=>{
+      (CONFIG.schemes || []).forEach(s=>{
         const opt=document.createElement('option');
         opt.value=s.id; opt.textContent=s.name;
         schemeSelect.appendChild(opt);
@@ -829,7 +842,7 @@
       };
       salaryOH = CONFIG.overhead.salary_percent/100;
       otherOH = CONFIG.overhead.other_percent/100;
-      ohBadge.textContent = `OH ${CONFIG.overhead.label}: salary ${CONFIG.overhead.salary_percent}%, other ${CONFIG.overhead.other_percent}%`;
+      ohBadge.textContent = 'OH ' + CONFIG.overhead.label + ': salary ' + CONFIG.overhead.salary_percent + '%, other ' + CONFIG.overhead.other_percent + '%';
       ohBadge.classList.remove('hidden');
       SCHEMES = { vr: CONFIG.schemes[0] };
       schemeSelect.innerHTML='';
