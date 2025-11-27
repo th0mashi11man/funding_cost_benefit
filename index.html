@@ -152,8 +152,7 @@
         <label for="servicePurchases">Service purchases (consultants, subcontracting, evaluation)</label>
         <input id="servicePurchases" data-decimal="false" inputmode="numeric" placeholder="e.g., 500 000"/>
         <div class="help">
-          For EU–Horizon, do <strong>not</strong> include this amount in the main
-          “Amount for Applied IT” above.
+          For EU–Horizon, this amount is part of the Applied IT budget. The department must co-finance 100% of the overhead on these costs.
         </div>
       </div>
       <div>
@@ -267,7 +266,6 @@
   // ---------- elements
   const pageTitle=$('pageTitle'), ohBadge=$('ohBadge'), configWarn=$('configWarn');
 
-  const schemeSection = $('schemeSection');
   const projectSection = $('projectSection');
   const directSection = $('directSection');
   const calcSection = $('calcSection');
@@ -489,24 +487,6 @@
       parts.push(`<strong>Funder:</strong> ${sc.funder.label}.`);
     }
 
-    if(Array.isArray(sc.uf_rules) && sc.uf_rules.length){
-      const lines = [];
-      sc.uf_rules.forEach(r=>{
-        const who = r.name || 'University/Faculty';
-        const note = r.notes || '';
-        if(r.mode === 'per_fte_per_year'){
-          lines.push(`${who}: ${note} (added on top of the grant amount).`);
-        } else if(note){
-          lines.push(`${who}: ${note}.`);
-        } else {
-          lines.push(`${who}: ${r.mode}.`);
-        }
-      });
-      if(lines.length){
-        parts.push(`<strong>University / Faculty co-funding:</strong> ${lines.join(' ')}`);
-      }
-    }
-
     if (Array.isArray(sc.uf_rules) && sc.uf_rules.length) {
       const uniLines = [];
       const facLines = [];
@@ -518,9 +498,8 @@
         // RJ top-up handled separately
         if (r.mode === "per_fte_per_year") return;
 
-        // Sort into “University” or “Faculty” groups
         if (r.name && r.name.toLowerCase().includes("rektor")) {
-          uniLines.push(note.replace(/^VC\s*/i, "")); 
+          uniLines.push(note.replace(/^VC\s*/i, ""));
         } 
         else if (r.name && r.name.toLowerCase().includes("faculty")) {
           facLines.push(note.replace(/^Faculty\s*/i, ""));
@@ -543,7 +522,7 @@
 
     // Scheme-specific clarifications
     if(sc.id === 'horizon'){
-      parts.push('<strong>Special rule:</strong> No overhead on service purchases; these must be 100% department financed.');
+      parts.push('<strong>Special rule:</strong> Service purchases are part of the project budget, but the department must co-finance 100% of the overhead on these costs.');
     }
     if(sc.id === 'rj_programme' || sc.id === 'rj_project'){
       parts.push('<strong>Special rule:</strong> The 170 000 SEK per FTE and year is added on top of the RJ grant amount and does not reduce the requested amount from RJ.');
@@ -566,10 +545,8 @@
     }
     activeScheme = SCHEMES[val] || null;
 
-    // show core sections after scheme chosen
     showCoreSections(true);
 
-    // scheme-specific fields
     const id = activeScheme.id;
     staffFTERow.classList.toggle('hidden', !schemesNeedingFTE.has(id));
     serviceRow.classList.toggle('hidden', !schemesNeedingService.has(id));
@@ -619,13 +596,13 @@
           ${row('Planned salary costs', d.plannedSal)}
           ${row('…of which existing staff salaries', d.userSalaries)}
           ${row('Other direct costs (non-service)', d.other)}
-          ${row('Service purchases (dept-funded, no OH)', d.deptService)}
+          ${row('Service purchases (dept-funded OH only)', d.deptService)}
         </div>
 
         <div class="section-title">Departmental co-financing needed</div>
         <div class="kv">
           ${row('Dept co-financing for OH gap', d.coFinNetOH)}
-          ${row('Dept co-financing for service purchases', d.deptService)}
+          ${row('Dept co-financing for service purchases (OH)', d.deptService)}
           ${row('Total departmental co-financing', d.coFinNetTotal)}
         </div>
       </div>
@@ -642,32 +619,62 @@
     const { base, bonus: rjTopup, total: effectiveTotal } = getEffectiveTotal();
     const {deptOver, direct} = calcWithDerivedShare(effectiveTotal);
 
-    const funderCoverage = getFunderCoverage(effectiveTotal, deptOver);
+    const service = Math.max(0, Math.round(num(servicePurchases.value || 0)));
 
-    const coFinRaw = Math.max(0, deptOver - Math.min(deptOver, funderCoverage));
+    let funderCoverage = 0;
+    let coFinRaw = 0;
+    let ufAgg, ufApplied, ufByNameScaled, coFinNetOH;
+    let deptService = 0;
 
-    // UF rules use the base external grant as "total" (e.g. % of grant volume)
-    const ufAgg = sumUfAmount(activeScheme.uf_rules, base, years, deptOver, coFinRaw);
-    const ufApplied = Math.min(ufAgg.amount, coFinRaw);
+    if (activeScheme && activeScheme.id === 'horizon') {
+      // Overhead on service purchases: department must cover 100% of this OH
+      const serviceOH = Math.round(service * (otherOH / (1 + otherOH)));
+      deptService = serviceOH;
 
-    const scale = ufAgg.amount > 0 ? (ufApplied / ufAgg.amount) : 0;
-    const ufByNameScaled = {};
-    for (const [name, val] of Object.entries(ufAgg.byName || {})) {
-      ufByNameScaled[name] = Math.round(val * scale);
+      const nonServiceOver = Math.max(0, deptOver - serviceOH);
+
+      // EU covers 25% of OH on non-service direct costs only
+      funderCoverage = getFunderCoverage(effectiveTotal, nonServiceOver);
+
+      const coveredNonService = Math.min(nonServiceOver, funderCoverage);
+      coFinRaw = Math.max(0, nonServiceOver - coveredNonService);
+
+      ufAgg = sumUfAmount(activeScheme.uf_rules, base, years, nonServiceOver, coFinRaw);
+      ufApplied = Math.min(ufAgg.amount, coFinRaw);
+
+      const scale = ufAgg.amount > 0 ? (ufApplied / ufAgg.amount) : 0;
+      ufByNameScaled = {};
+      for (const [name, val] of Object.entries(ufAgg.byName || {})) {
+        ufByNameScaled[name] = Math.round(val * scale);
+      }
+
+      // OH gap after UF on non-service costs
+      coFinNetOH = Math.max(0, coFinRaw - ufApplied);
+
+      // For bar visualisation, we want total funder coverage on OH (only non-service part)
+      funderCoverage = coveredNonService;
+    } else {
+      funderCoverage = getFunderCoverage(effectiveTotal, deptOver);
+
+      const covered = Math.min(deptOver, funderCoverage);
+      coFinRaw = Math.max(0, deptOver - covered);
+
+      ufAgg = sumUfAmount(activeScheme.uf_rules, base, years, deptOver, coFinRaw);
+      ufApplied = Math.min(ufAgg.amount, coFinRaw);
+
+      const scale = ufAgg.amount > 0 ? (ufApplied / ufAgg.amount) : 0;
+      ufByNameScaled = {};
+      for (const [name, val] of Object.entries(ufAgg.byName || {})) {
+        ufByNameScaled[name] = Math.round(val * scale);
+      }
+
+      coFinNetOH = Math.max(0, coFinRaw - ufApplied);
     }
-
-    const coFinNetOH = Math.max(0, coFinRaw - ufApplied);
 
     clampSalaryInputs(direct);
     const plannedSal = Math.max(0, Math.round(num(plannedSalaryDirect.value)));
     const userSalaries = Math.max(0, Math.round(num(existingSalaries.value)));
     const other = Math.max(0, direct - plannedSal);
-
-    const service = Math.max(0, Math.round(num(servicePurchases.value || 0)));
-    let deptService = 0;
-    if (activeScheme && activeScheme.id === 'horizon' && service > 0) {
-      deptService = service;
-    }
 
     const coFinNetTotal = coFinNetOH + deptService;
 
@@ -773,7 +780,6 @@
     numbersDump.innerHTML='';
     lastShare=0.5;
 
-    // back to placeholder
     if(schemeSelect.options.length>0){
       schemeSelect.selectedIndex = 0;
     }
