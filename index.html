@@ -64,6 +64,7 @@
 <div class="wrap">
   <h1 id="pageTitle">Applied IT – Research Funding Financial Cost-Benefit Calculator</h1>
 
+  <!-- Top bar with OH policy and config status -->
   <div class="section">
     <div class="row" style="justify-content:space-between;align-items:center;gap:10px">
       <div>
@@ -74,65 +75,70 @@
         Could not load <span class="mono">config.json</span>. Using fallback.
       </div>
     </div>
+  </div>
 
-    <!-- Amount, years, scheme -->
-    <div class="section">
-      <div class="grid cols-2">
-        <div>
-          <label for="requestedAmount">Amount for Applied IT (excl. funding for partners)</label>
-          <input id="requestedAmount" data-decimal="false" inputmode="numeric" placeholder="e.g., 10 000 000"/>
-        </div>
-        <div>
-          <label for="projectYears">Project duration (years)</label>
-          <input id="projectYears" data-decimal="false" inputmode="numeric" placeholder="e.g., 4"/>
-        </div>
-        <div>
-          <label for="staffFTE">Number of funded FTEs (for RJ etc.)</label>
-          <input id="staffFTE" data-decimal="true" placeholder="e.g., 1.5"/>
-        </div>
-        <div>
-          <label for="schemeSelect">Grant scheme</label>
-          <select id="schemeSelect"></select>
-          <div class="help" id="schemeInfo"></div>
-        </div>
+  <!-- STEP 1: select scheme -->
+  <div class="section" id="schemeSection">
+    <label for="schemeSelect">1. Select grant scheme</label>
+    <select id="schemeSelect"></select>
+    <div class="help" id="schemeInfo" style="margin-top:6px">
+      Start by choosing the grant scheme. The calculator will then show only the fields relevant for that scheme.
+    </div>
+  </div>
+
+  <!-- STEP 2: project & funder inputs (shown after scheme is chosen) -->
+  <div class="section hidden" id="projectSection">
+    <strong>2. Project parameters & funder coverage</strong>
+    <div class="grid cols-2" style="margin-top:10px">
+      <div>
+        <label for="requestedAmount">Amount for Applied IT (excl. funding for partners)</label>
+        <input id="requestedAmount" data-decimal="false" inputmode="numeric" placeholder="e.g., 10 000 000"/>
       </div>
-
-      <div style="margin-top:10px">
+      <div>
+        <label for="projectYears">Project duration (years)</label>
+        <input id="projectYears" data-decimal="false" inputmode="numeric" placeholder="e.g., 4"/>
+      </div>
+      <div id="staffFTERow" class="hidden">
+        <label for="staffFTE">Number of positions funded (FTE)</label>
+        <input id="staffFTE" data-decimal="true" placeholder="e.g., 1.5"/>
+        <div class="help">Used for RJ schemes where the foundation contributes 170 000 SEK per FTE and year.</div>
+      </div>
+      <div>
         <label>Available for direct costs (live)</label>
         <div class="pill mono" id="availableDirectLine">—</div>
       </div>
+    </div>
 
-      <!-- Manual funder controls (only for "Other") -->
-      <div id="funderControls" class="grid cols-2" style="margin-top:10px">
-        <div>
-          <label for="funderModeSelect">Funder indirect cost coverage</label>
-          <select id="funderModeSelect">
-            <option value="percent_overhead" selected>% of overhead</option>
-            <option value="absolute">Fixed amount</option>
-            <option value="percent_total">% of total</option>
-          </select>
+    <!-- Manual funder controls (only for "Other") -->
+    <div id="funderControls" class="grid cols-2" style="margin-top:10px">
+      <div>
+        <label for="funderModeSelect">Funder indirect cost coverage</label>
+        <select id="funderModeSelect">
+          <option value="percent_overhead" selected>% of overhead</option>
+          <option value="absolute">Fixed amount</option>
+          <option value="percent_total">% of total</option>
+        </select>
+      </div>
+      <div>
+        <div id="funderPercentOverBox">
+          <label for="funderPercentOverhead">% of overhead covered</label>
+          <input id="funderPercentOverhead" data-decimal="true" placeholder="e.g., 75"/>
         </div>
-        <div>
-          <div id="funderPercentOverBox">
-            <label for="funderPercentOverhead">% of overhead covered</label>
-            <input id="funderPercentOverhead" data-decimal="true" placeholder="e.g., 75"/>
-          </div>
-          <div id="funderAbsoluteBox" class="hidden">
-            <label for="funderOverheadAbsolute">Fixed amount for indirect costs</label>
-            <input id="funderOverheadAbsolute" data-decimal="false" inputmode="numeric" placeholder="e.g., 1 000 000"/>
-          </div>
-          <div id="funderPercentTotalBox" class="hidden">
-            <label for="funderOverheadPercent">% of total grant for indirect costs</label>
-            <input id="funderOverheadPercent" data-decimal="true" placeholder="e.g., 20"/>
-          </div>
+        <div id="funderAbsoluteBox" class="hidden">
+          <label for="funderOverheadAbsolute">Fixed amount for indirect costs</label>
+          <input id="funderOverheadAbsolute" data-decimal="false" inputmode="numeric" placeholder="e.g., 1 000 000"/>
+        </div>
+        <div id="funderPercentTotalBox" class="hidden">
+          <label for="funderOverheadPercent">% of total grant for indirect costs</label>
+          <input id="funderOverheadPercent" data-decimal="true" placeholder="e.g., 20"/>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Direct cost allocation -->
-  <div class="section">
-    <strong>Direct cost allocation</strong>
+  <!-- STEP 3: Direct costs (shown after scheme is chosen) -->
+  <div class="section hidden" id="directSection">
+    <strong>3. Direct cost allocation</strong>
     <div class="grid cols-2" style="margin-top:10px">
       <div>
         <label for="plannedSalaryDirect">Planned salary costs</label>
@@ -142,12 +148,12 @@
         <label for="existingSalaries">…of which salary for existing staff</label>
         <input id="existingSalaries" data-decimal="false" inputmode="numeric" placeholder="e.g., 6 000 000"/>
       </div>
-      <div>
+      <div id="serviceRow" class="hidden">
         <label for="servicePurchases">Service purchases (consultants, subcontracting, evaluation)</label>
         <input id="servicePurchases" data-decimal="false" inputmode="numeric" placeholder="e.g., 500 000"/>
         <div class="help">
           For EU–Horizon, do <strong>not</strong> include this amount in the main
-          “Amount for Applied IT” above. It is fully department-financed and not subject to OH.
+          “Amount for Applied IT” above.
         </div>
       </div>
       <div>
@@ -157,8 +163,8 @@
     </div>
   </div>
 
-  <!-- Calculate & Results -->
-  <div class="section">
+  <!-- STEP 4: Calculation and results (shown after scheme is chosen) -->
+  <div class="section hidden" id="calcSection">
     <div class="row" style="justify-content:flex-end;gap:10px">
       <button id="calcBtn">Calculate</button>
       <button id="resetBtn" class="secondary">Reset</button>
@@ -192,7 +198,7 @@
   </div>
 
   <div class="footer">
-    <div>NB: This tool is illustrative and depends on current GU/Faculty rules. Always verify with the faculty finance office before submitting applications.</div>
+    <div>NB: This tool is for illustrative purposes only. Always verify with a financial officer before submitting applications.</div>
   </div>
 </div>
 
@@ -201,45 +207,46 @@
   const $ = id => document.getElementById(id);
   const fmt = n => (isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:0}).replace(/,/g,' ') : '—');
 
-  // Parse numbers that may include spaces as thousand separators and allow decimals if present
+  // Parse numbers that may include spaces, comma/dot decimals
   const num = (s)=>{
     if(!s) return 0;
     const t=String(s);
-    // keep digits, commas, dots, spaces, and optional leading minus
     let u=t.replace(/[^\d.,\s-]/g,'').trim();
     const neg = /^-/.test(u);
-    u = u.replace(/-/g,'');
-    // identify last decimal separator if any
-    const lastComma=u.lastIndexOf(',');
-    const lastDot=u.lastIndexOf('.');
+    u=u.replace(/-/g,'');
+    const lastComma=u.lastIndexOf(','), lastDot=u.lastIndexOf('.');
     let decSep=null;
     if(lastComma>lastDot) decSep=',';
     else if(lastDot>lastComma) decSep='.';
     if(decSep){
-      // split into integer and decimal parts
-      const i = u.lastIndexOf(decSep);
-      const ip = u.slice(0,i).replace(/[^\d]/g,'');
-      const dp = u.slice(i+1).replace(/[^\d]/g,'');
+      const i=u.lastIndexOf(decSep);
+      const ip=u.slice(0,i).replace(/[^\d]/g,'');
+      const dp=u.slice(i+1).replace(/[^\d]/g,'');
       return (neg?-1:1)*Number(ip+'.'+dp || '0');
     } else {
       return (neg?-1:1)*Number(u.replace(/[^\d]/g,'') || '0');
     }
   };
 
-  // format with spaces while typing, preserves optional decimal part when allowed
   function formatNumericInput(el){
     const allowDecimal = el.getAttribute('data-decimal') === 'true';
     const original = el.value;
-    let v = original.replace(/[^\d.,]/g,''); // keep digits, . ,
+    let v = original.replace(/[^\d.,]/g,'');
     const lastComma=v.lastIndexOf(','), lastDot=v.lastIndexOf('.');
     let decSep=null;
     if(allowDecimal && (lastComma>=0 || lastDot>=0)) decSep = (lastComma>lastDot)?',':'.';
-    if(decSep){ v = v.replace(decSep==='.'?/,/g:/\./g,''); }
-    else { v = v.replace(/[.,]/g,''); }
+    if(decSep){
+      v = v.replace(decSep==='.'?/,/g:/\./g,'');
+    } else {
+      v = v.replace(/[.,]/g,'');
+    }
     let intPart=v, fracPart='';
     if(decSep){
       const ix=v.indexOf(decSep);
-      if(ix>=0){ intPart=v.slice(0,ix); fracPart=v.slice(ix+1).replace(/[^\d]/g,''); }
+      if(ix>=0){
+        intPart=v.slice(0,ix);
+        fracPart=v.slice(ix+1).replace(/[^\d]/g,'');
+      }
     }
     intPart=intPart.replace(/[^\d]/g,'');
     const formattedInt=intPart.replace(/\B(?=(\d{3})+(?!\d))/g,' ');
@@ -257,9 +264,16 @@
 
   // ---------- elements
   const pageTitle=$('pageTitle'), ohBadge=$('ohBadge'), configWarn=$('configWarn');
-  const requestedAmount=$('requestedAmount'), projectYears=$('projectYears');
-  const staffFTE=$('staffFTE');
+
+  const schemeSection = $('schemeSection');
+  const projectSection = $('projectSection');
+  const directSection = $('directSection');
+  const calcSection = $('calcSection');
+
   const schemeSelect=$('schemeSelect'), schemeInfo=$('schemeInfo');
+
+  const requestedAmount=$('requestedAmount'), projectYears=$('projectYears');
+  const staffFTERow=$('staffFTERow'), staffFTE=$('staffFTE');
 
   const funderControls=$('funderControls');
   const funderModeSelect=$('funderModeSelect');
@@ -274,7 +288,8 @@
   const availableDirectLine=$('availableDirectLine');
   const availableOtherLine=$('availableOtherLine');
   const plannedSalaryDirect=$('plannedSalaryDirect'), existingSalaries=$('existingSalaries');
-  const servicePurchases=$('servicePurchases');
+
+  const serviceRow=$('serviceRow'), servicePurchases=$('servicePurchases');
 
   const resultContainer=$('resultContainer'), resultTag=$('resultTag'), resultExplanation=$('resultExplanation');
   const barContainer=$('barContainer'), legend=$('legend');
@@ -286,6 +301,9 @@
   let salaryOH=0.62, otherOH=0.52;
   let activeScheme=null;
   let lastShare=0.5;
+
+  const schemesNeedingFTE = new Set(['rj_programme','rj_project']);
+  const schemesNeedingService = new Set(['horizon']);
 
   // ---------- UF rules engine
   function computeUfAmount(rule, total, years, deptOver, coFinRaw){
@@ -363,6 +381,7 @@
 
   // ---------- core math
   function getFunderCoverage(total, deptOver){
+    if(!activeScheme) return 0;
     const mode = activeScheme.funder.mode;
     if(mode==='percent_overhead'){
       const p = activeScheme.funder.value ?? num(funderPercentOverhead.value);
@@ -397,6 +416,9 @@
   }
 
   function calcWithDerivedShare(total){
+    if(!activeScheme){
+      return {deptOver:0, direct:0};
+    }
     let share = lastShare;
     const rs = Math.max(0, Math.min(salaryOH,5));
     const ro = Math.max(0, Math.min(otherOH,5));
@@ -416,7 +438,7 @@
 
   // ---------- UI logic
   function toggleFunderInputs(){
-    const isOther = (schemeSelect.value==='other');
+    const isOther = (activeScheme && activeScheme.id==='other');
     funderControls.classList.toggle('hidden', !isOther);
     const mode = isOther ? funderModeSelect.value : 'percent_overhead';
     funderPercentOverBox.classList.toggle('hidden', !(isOther && mode==='percent_overhead'));
@@ -424,7 +446,18 @@
     funderPercentTotalBox.classList.toggle('hidden', !(isOther && mode==='percent_total'));
   }
 
+  function showCoreSections(show){
+    projectSection.classList.toggle('hidden', !show);
+    directSection.classList.toggle('hidden', !show);
+    calcSection.classList.toggle('hidden', !show);
+  }
+
   function updateLive(){
+    if(!activeScheme){
+      availableDirectLine.textContent='—';
+      availableOtherLine.textContent='—';
+      return;
+    }
     const total = Math.round(num(requestedAmount.value));
     const {deptOver, direct} = calcWithDerivedShare(total);
     availableDirectLine.textContent = fmt(direct);
@@ -434,13 +467,30 @@
   }
 
   function applyScheme(){
-    const id = schemeSelect.value;
-    activeScheme = SCHEMES[id] || SCHEMES['vr'];
+    const val = schemeSelect.value;
+    if(!val){
+      activeScheme = null;
+      schemeInfo.textContent = 'Start by choosing the grant scheme. The calculator will then show only the fields relevant for that scheme.';
+      showCoreSections(false);
+      updateLive();
+      return;
+    }
+    activeScheme = SCHEMES[val] || null;
     const f = activeScheme.funder;
     const label = f.label || '';
-    const parts = [id.toUpperCase(), label].filter(Boolean).join(' – ');
+    const parts = [activeScheme.name, label].filter(Boolean).join(' – ');
     schemeInfo.textContent = parts;
+
+    // show core sections after scheme chosen
+    showCoreSections(true);
+
+    // scheme-specific fields
+    const id = activeScheme.id;
+    staffFTERow.classList.toggle('hidden', !schemesNeedingFTE.has(id));
+    serviceRow.classList.toggle('hidden', !schemesNeedingService.has(id));
+
     toggleFunderInputs();
+    updateLive();
   }
 
   function renderSummary(d){
@@ -494,28 +544,27 @@
 
   // ---------- Calculate & render
   function calculate(){
+    if(!activeScheme){
+      alert('Please select a grant scheme first.');
+      return;
+    }
     const total=Math.round(num(requestedAmount.value));
     const years = projectYears.value || '1';
     const {deptOver, direct} = calcWithDerivedShare(total);
 
-    // funder coverage
     const funderCoverage = getFunderCoverage(total, deptOver);
 
-    // dept co-finance before Univ/Faculty
     const coFinRaw = Math.max(0, deptOver - Math.min(deptOver, funderCoverage));
 
-    // UF contribution (sum of rules; applied up to coFinRaw)
     const ufAgg = sumUfAmount(activeScheme.uf_rules, total, years, deptOver, coFinRaw);
     const ufApplied = Math.min(ufAgg.amount, coFinRaw);
 
-    // If UF rules exceed coFinRaw, scale them down proportionally for breakdown
     const scale = ufAgg.amount > 0 ? (ufApplied / ufAgg.amount) : 0;
     const ufByNameScaled = {};
     for (const [name, val] of Object.entries(ufAgg.byName || {})) {
       ufByNameScaled[name] = Math.round(val * scale);
     }
 
-    // Final dept co-finance for overhead gap
     const coFinNetOH = Math.max(0, coFinRaw - ufApplied);
 
     clampSalaryInputs(direct);
@@ -523,7 +572,6 @@
     const userSalaries = Math.max(0, Math.round(num(existingSalaries.value)));
     const other = Math.max(0, direct - plannedSal);
 
-    // Service purchases – fully dept-funded (no OH), especially relevant for Horizon
     const service = Math.max(0, Math.round(num(servicePurchases.value || 0)));
     let deptService = 0;
     if (activeScheme && activeScheme.id === 'horizon' && service > 0) {
@@ -532,7 +580,7 @@
 
     const coFinNetTotal = coFinNetOH + deptService;
 
-    // Verdict tag
+    // verdict
     let cls='warn', txt='UNCLEAR cost-benefit advantage';
     let expl=`Department co-financing cost after Univ/Faculty contribution (${fmt(coFinNetTotal)}) is comparable to coverage of existing-salary costs (${fmt(userSalaries)}).`;
     if(userSalaries>coFinNetTotal){
@@ -547,7 +595,7 @@
     resultExplanation.textContent=expl;
     resultContainer.classList.remove('hidden');
 
-    // Bar/legend (hide zero-value segments)
+    // bar
     const vals = {
       used: Math.min(deptOver, funderCoverage),
       other,
@@ -583,7 +631,7 @@
       seg(bars.cofin,    'leg-cofin', vals.coFinNet);
     }
 
-    // Summary (always show after calc)
+    // summary
     numbersDump.innerHTML = renderSummary({
       scheme: schemeSelect.options[schemeSelect.selectedIndex].text,
       total,
@@ -607,9 +655,6 @@
     requestedAmount.value='';
     projectYears.value='';
     staffFTE.value='';
-    const defId = (CONFIG?.defaultScheme) || 'vr';
-    const defIndex = Array.from(schemeSelect.options).findIndex(o=>o.value===defId);
-    schemeSelect.selectedIndex = defIndex>=0 ? defIndex : 0;
     funderModeSelect.value='percent_overhead';
     funderPercentOverhead.value='';
     funderOverheadAbsolute.value='';
@@ -625,12 +670,21 @@
     summaryBox.classList.add('hidden');
     numbersDump.innerHTML='';
     lastShare=0.5;
-    applyScheme();
+
+    // back to placeholder
+    if(schemeSelect.options.length>0){
+      schemeSelect.selectedIndex = 0;
+    }
+    activeScheme = null;
+    staffFTERow.classList.add('hidden');
+    serviceRow.classList.add('hidden');
+    showCoreSections(false);
+    schemeInfo.textContent = 'Start by choosing the grant scheme. The calculator will then show only the fields relevant for that scheme.';
   }
 
   // ---------- config load + UI build
   async function loadConfig(){
-    const cacheBust = `?v=${Date.now()}`; // avoid GH Pages caching
+    const cacheBust = `?v=${Date.now()}`;
     try{
       const res = await fetch('config.json'+cacheBust, { cache: 'no-store' });
       if(!res.ok) throw new Error('HTTP '+res.status);
@@ -649,35 +703,43 @@
       for(const s of CONFIG.schemes){
         SCHEMES[s.id] = s;
       }
+
       schemeSelect.innerHTML='';
+      const ph=document.createElement('option');
+      ph.value=''; ph.textContent='Select grant scheme…'; ph.disabled=true; ph.selected=true;
+      schemeSelect.appendChild(ph);
       CONFIG.schemes.forEach(s=>{
         const opt=document.createElement('option');
         opt.value=s.id; opt.textContent=s.name;
         schemeSelect.appendChild(opt);
       });
-      const o=document.createElement('option'); o.value='other'; o.textContent='Other'; schemeSelect.appendChild(o);
 
-      const defId = CONFIG.defaultScheme || 'vr';
-      const defIndex = Array.from(schemeSelect.options).findIndex(x=>x.value===defId);
-      schemeSelect.selectedIndex = defIndex>=0 ? defIndex : 0;
-
-      applyScheme();
+      activeScheme = null;
+      showCoreSections(false);
       updateLive();
     }catch(err){
       console.error('Config load failed', err);
       configWarn.classList.remove('hidden');
       CONFIG = {
         overhead:{label:'fallback',salary_percent:54,other_percent:45},
-        defaultScheme:'vr',
         schemes:[
           {id:'vr',name:'VR – fallback',funder:{mode:'percent_overhead',value:100,label:'Covers all overhead costs'},uf_rules:[]}
         ]
       };
+      salaryOH = CONFIG.overhead.salary_percent/100;
+      otherOH = CONFIG.overhead.other_percent/100;
+      ohBadge.textContent = `OH ${CONFIG.overhead.label}: salary ${CONFIG.overhead.salary_percent}%, other ${CONFIG.overhead.other_percent}%`;
+      ohBadge.classList.remove('hidden');
       SCHEMES = { vr: CONFIG.schemes[0] };
+      schemeSelect.innerHTML='';
+      const ph=document.createElement('option');
+      ph.value=''; ph.textContent='Select grant scheme…'; ph.disabled=true; ph.selected=true;
+      schemeSelect.appendChild(ph);
       const opt=document.createElement('option');
       opt.value='vr'; opt.textContent='VR – fallback';
       schemeSelect.appendChild(opt);
-      applyScheme();
+      activeScheme = null;
+      showCoreSections(false);
     }
   }
 
@@ -687,15 +749,19 @@
       el.addEventListener('input', ()=>{ formatNumericInput(el); updateLive(); });
       el.addEventListener('blur', ()=>{ formatNumericInput(el); updateLive(); });
     });
-    schemeSelect.addEventListener('change', ()=>{ applyScheme(); updateLive(); });
+
+    schemeSelect.addEventListener('change', ()=>{ applyScheme(); });
     funderModeSelect.addEventListener('change', ()=>{ toggleFunderInputs(); updateLive(); });
+
     ['funderPercentOverhead','funderOverheadAbsolute','funderOverheadPercent'].forEach(id=>{
       const el=$(id);
       el.addEventListener('input', ()=>{ formatNumericInput(el); updateLive(); });
       el.addEventListener('blur', ()=>{ formatNumericInput(el); updateLive(); });
     });
+
     plannedSalaryDirect.addEventListener('input', updateLive);
     existingSalaries.addEventListener('input', updateLive);
+
     $('calcBtn').addEventListener('click', calculate);
     $('resetBtn').addEventListener('click', resetAll);
   }
