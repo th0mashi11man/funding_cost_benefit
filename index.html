@@ -477,63 +477,60 @@
     availableOtherLine.textContent = fmt(other);
   }
 
-  function describeScheme(sc){
-    if(!sc){
-      return 'Start by choosing the grant scheme. The calculator will then show only the fields relevant for that scheme.';
-    }
-    const parts = [];
+	function describeScheme(sc){
+  	  if(!sc){
+    	  return 'Start by choosing the grant scheme. If it isn't listed, choose other...';
+   	 }
 
-    if(sc.funder && sc.funder.label){
-      parts.push(`<strong>Funder:</strong> ${sc.funder.label}.`);
-    }
+    	const parts = [];
 
-    if (Array.isArray(sc.uf_rules) && sc.uf_rules.length) {
-      const uniLines = [];
-      const facLines = [];
-      const otherLines = [];
+    	// Funder explanation
+    	if(sc.funder && sc.funder.label){
+      	parts.push(`<strong>Funder:</strong> ${sc.funder.label}.`);
+    	}
 
-      sc.uf_rules.forEach(r => {
-        const note = r.notes || "";
+    	// University / Faculty contributions
+    	if (Array.isArray(sc.uf_rules) && sc.uf_rules.length) {
+      	const uniLines = [];
+      	const facLines = [];
 
-        // RJ top-up handled separately
-        if (r.mode === "per_fte_per_year") return;
+      	sc.uf_rules.forEach(r => {
+        	// RJ top-ups are handled separately and should not appear here
+        	if (r.mode === "per_fte_per_year") return;
 
-        if (r.name && r.name.toLowerCase().includes("rektor")) {
-          uniLines.push(note.replace(/^VC\s*/i, ""));
-        } 
-        else if (r.name && r.name.toLowerCase().includes("faculty")) {
-          facLines.push(note.replace(/^Faculty\s*/i, ""));
-        }
-        else {
-          otherLines.push(note);
-        }
-      });
+        	const note = r.notes || "";
 
-      if (uniLines.length) {
-        parts.push(`<strong>University co-funding:</strong> ${uniLines.join(" ")}`);
-      }
-      if (facLines.length) {
-        parts.push(`<strong>Faculty co-funding:</strong> ${facLines.join(" ")}`);
-      }
-      if (otherLines.length) {
-        parts.push(`<strong>Additional co-funding:</strong> ${otherLines.join(" ")}`);
-      }
-    }
+        	// University
+        	if (r.name && r.name.toLowerCase().includes("rektor")) {
+          	uniLines.push(note.replace(/^VC\s*/i, "").replace(/^Rektor\s*/i, ""));
+        	} 
 
-    // Scheme-specific clarifications
-    if(sc.id === 'horizon'){
-      parts.push('<strong>Special rule:</strong> Service purchases are part of the project budget, but the department must co-finance 100% of the overhead on these costs.');
-    }
-    if(sc.id === 'rj_programme' || sc.id === 'rj_project'){
-      parts.push('<strong>Special rule:</strong> The 170 000 SEK per FTE and year is added on top of the RJ grant amount and does not reduce the requested amount from RJ.');
-    }
-    if(sc.id === 'kaw_project'){
-      parts.push('<strong>Note:</strong> Applies to KAW “Forskningsprojekt av hög vetenskaplig potential” with central co-funding subject to internal approval.');
-    }
+        	// Faculty
+        	else if (r.name && r.name.toLowerCase().includes("faculty")) {
+          	facLines.push(note.replace(/^Faculty\s*/i, "").replace(/\(nt\)/i, "").trim());
+        	}
+      	});
 
-    return parts.join('<br>');
-  }
+      	if (uniLines.length) {
+        	parts.push(`<strong>University co-funding:</strong> ${uniLines.join(" ")}`);
+      	}
+      	if (facLines.length) {
+        	parts.push(`<strong>Faculty co-funding:</strong> ${facLines.join(" ")}`);
+      	}
+    	}
 
+    	// Scheme-specific clarifications
+    	if(sc.id === 'horizon'){
+      	parts.push('<strong>Special rule:</strong> All indirect costs on service purchases must be covered by the department.');
+    	}
+    	if(sc.id === 'rj_programme' || sc.id === 'rj_project'){
+      	parts.push('<strong>Special rule:</strong> The 170 000 SEK per FTE and year is added on top of the RJ grant amount and does not reduce the requested amount from RJ.');
+    	}
+
+    	return parts.join('<br>');
+	}
+
+  
   function applyScheme(){
     const val = schemeSelect.value;
     if(!val){
