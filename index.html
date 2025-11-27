@@ -507,6 +507,40 @@
       }
     }
 
+    if (Array.isArray(sc.uf_rules) && sc.uf_rules.length) {
+      const uniLines = [];
+      const facLines = [];
+      const otherLines = [];
+
+      sc.uf_rules.forEach(r => {
+        const note = r.notes || "";
+
+        // RJ top-up handled separately
+        if (r.mode === "per_fte_per_year") return;
+
+        // Sort into “University” or “Faculty” groups
+        if (r.name && r.name.toLowerCase().includes("rektor")) {
+          uniLines.push(note.replace(/^VC\s*/i, "")); 
+        } 
+        else if (r.name && r.name.toLowerCase().includes("faculty")) {
+          facLines.push(note.replace(/^Faculty\s*/i, ""));
+        }
+        else {
+          otherLines.push(note);
+        }
+      });
+
+      if (uniLines.length) {
+        parts.push(`<strong>University co-funding:</strong> ${uniLines.join(" ")}`);
+      }
+      if (facLines.length) {
+        parts.push(`<strong>Faculty co-funding:</strong> ${facLines.join(" ")}`);
+      }
+      if (otherLines.length) {
+        parts.push(`<strong>Additional co-funding:</strong> ${otherLines.join(" ")}`);
+      }
+    }
+
     // Scheme-specific clarifications
     if(sc.id === 'horizon'){
       parts.push('<strong>Special rule:</strong> No overhead on service purchases; these must be 100% department financed.');
