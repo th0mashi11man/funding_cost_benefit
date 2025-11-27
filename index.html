@@ -101,7 +101,7 @@
       <div id="staffFTERow" class="hidden">
         <label for="staffFTE">Number of positions funded (FTE)</label>
         <input id="staffFTE" data-decimal="true" placeholder="e.g., 1.5"/>
-        <div class="help">Used for RJ schemes where the foundation contributes 170 000 SEK per FTE and year.</div>
+        <div class="help">Used for RJ schemes where the foundation contributes 170 000 SEK per FTE and year on top of the grant.</div>
       </div>
       <div>
         <label>Available for direct costs (live)</label>
@@ -206,6 +206,8 @@
   // ---------- helpers
   const $ = id => document.getElementById(id);
   const fmt = n => (isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:0}).replace(/,/g,' ') : '—');
+
+  const RJ_TOPUP_PER_FTE_YEAR = 170000;
 
   // Parse numbers that may include spaces, comma/dot decimals
   const num = (s)=>{
@@ -339,11 +341,9 @@
       return Math.max(0, Math.round(capped));
     }
 
-    // 170k SEK per FTE and year (RJ etc.)
+    // per_fte_per_year is now handled as a project top-up for RJ, not as UF OH coverage
     if(mode === 'per_fte_per_year'){
-      const a = Number(rule.amount_per_year || 0);
-      const fte = Math.max(0, Number(num(staffFTE.value)));
-      return Math.max(0, Math.round(a * fte * yrs));
+      return 0;
     }
 
     // share of OH gap (deptOver minus funder coverage)
@@ -361,6 +361,7 @@
     let sum=0, notes=[];
     const byName = {};
     for(const r of rules){
+      if(r.mode === 'per_fte_per_year') continue; // RJ top-up handled separately
       const a = computeUfAmount(r, total, years, deptOver, coFinRaw);
       sum += a;
       notes.push(r.notes || r.name || r.mode);
@@ -436,6 +437,18 @@
     return {deptOver, direct};
   }
 
+  // RJ top-up: base, bonus, total
+  function getEffectiveTotal(){
+    const base = Math.round(num(requestedAmount.value));
+    let bonus = 0;
+    if(activeScheme && schemesNeedingFTE.has(activeScheme.id)){
+      const fte = Math.max(0, Number(num(staffFTE.value)));
+      const yrs = Math.max(1, Math.round(num(projectYears.value || '1')));
+      bonus = Math.max(0, Math.round(RJ_TOPUP_PER_FTE_YEAR * fte * yrs));
+    }
+    return { base, bonus, total: base + bonus };
+  }
+
   // ---------- UI logic
   function toggleFunderInputs(){
     const isOther = (activeScheme && activeScheme.id==='other');
@@ -458,7 +471,7 @@
       availableOtherLine.textContent='—';
       return;
     }
-    const total = Math.round(num(requestedAmount.value));
+    const { total } = getEffectiveTotal();
     const {deptOver, direct} = calcWithDerivedShare(total);
     availableDirectLine.textContent = fmt(direct);
     const plannedSal = Math.max(0, Math.round(num(plannedSalaryDirect.value)));
@@ -466,20 +479,58 @@
     availableOtherLine.textContent = fmt(other);
   }
 
+  function describeScheme(sc){
+    if(!sc){
+      return 'Start by choosing the grant scheme. The calculator will then show only the fields relevant for that scheme.';
+    }
+    const parts = [];
+
+    if(sc.funder && sc.funder.label){
+      parts.push(`<strong>Funder:</strong> ${sc.funder.label}.`);
+    }
+
+    if(Array.isArray(sc.uf_rules) && sc.uf_rules.length){
+      const lines = [];
+      sc.uf_rules.forEach(r=>{
+        const who = r.name || 'University/Faculty';
+        const note = r.notes || '';
+        if(r.mode === 'per_fte_per_year'){
+          lines.push(`${who}: ${note} (added on top of the grant amount).`);
+        } else if(note){
+          lines.push(`${who}: ${note}.`);
+        } else {
+          lines.push(`${who}: ${r.mode}.`);
+        }
+      });
+      if(lines.length){
+        parts.push(`<strong>University / Faculty co-funding:</strong> ${lines.join(' ')}`);
+      }
+    }
+
+    // Scheme-specific clarifications
+    if(sc.id === 'horizon'){
+      parts.push('<strong>Special rule:</strong> No overhead on service purchases; these must be 100% department financed.');
+    }
+    if(sc.id === 'rj_programme' || sc.id === 'rj_project'){
+      parts.push('<strong>Special rule:</strong> The 170 000 SEK per FTE and year is added on top of the RJ grant amount and does not reduce the requested amount from RJ.');
+    }
+    if(sc.id === 'kaw_project'){
+      parts.push('<strong>Note:</strong> Applies to KAW “Forskningsprojekt av hög vetenskaplig potential” with central co-funding subject to internal approval.');
+    }
+
+    return parts.join('<br>');
+  }
+
   function applyScheme(){
     const val = schemeSelect.value;
     if(!val){
       activeScheme = null;
-      schemeInfo.textContent = 'Start by choosing the grant scheme. The calculator will then show only the fields relevant for that scheme.';
+      schemeInfo.innerHTML = describeScheme(null);
       showCoreSections(false);
       updateLive();
       return;
     }
     activeScheme = SCHEMES[val] || null;
-    const f = activeScheme.funder;
-    const label = f.label || '';
-    const parts = [activeScheme.name, label].filter(Boolean).join(' – ');
-    schemeInfo.textContent = parts;
 
     // show core sections after scheme chosen
     showCoreSections(true);
@@ -490,16 +541,19 @@
     serviceRow.classList.toggle('hidden', !schemesNeedingService.has(id));
 
     toggleFunderInputs();
+    schemeInfo.innerHTML = describeScheme(activeScheme);
     updateLive();
   }
 
   function renderSummary(d){
-    const row=(l,v)=>(v>0||v===0)?`<div class="k">${l}</div><div class="v mono">${fmt(v)}</div>`:'';
+    const row=(l,v)=> (v>0 || v===0) ? `<div class="k">${l}</div><div class="v mono">${fmt(v)}</div>` : '';
     const text=(l,v)=>`<div class="k">${l}</div><div class="v">${v}</div>`;
 
     const rector = d.ufByName && d.ufByName['Rektor'] ? d.ufByName['Rektor'] : 0;
     const faculty = d.ufByName && d.ufByName['Faculty (NT)'] ? d.ufByName['Faculty (NT)'] : 0;
     const otherUF = d.ufByName ? Object.entries(d.ufByName).filter(([name])=>name!=='Rektor' && name!=='Faculty (NT)').reduce((acc,[,val])=>acc+val,0) : 0;
+
+    const isRJ = (d.schemeId === 'rj_programme' || d.schemeId === 'rj_project');
 
     return `
     <div class="details-grid cols-2">
@@ -507,7 +561,9 @@
         <div class="section-title">Inputs</div>
         <div class="kv">
           ${text('Grant scheme', d.scheme)}
-          ${row('Amount for Applied IT', d.total)}
+          ${row('Amount for Applied IT (entered)', d.baseTotal)}
+          ${isRJ && d.rjTopup>0 ? row('RJ top-up (170k/FTE/year, added)', d.rjTopup) : ''}
+          ${row('Total project volume used in calculation', d.effectiveTotal)}
           ${text('Project duration', d.years + ' year(s)')}
         </div>
 
@@ -548,15 +604,16 @@
       alert('Please select a grant scheme first.');
       return;
     }
-    const total=Math.round(num(requestedAmount.value));
     const years = projectYears.value || '1';
-    const {deptOver, direct} = calcWithDerivedShare(total);
+    const { base, bonus: rjTopup, total: effectiveTotal } = getEffectiveTotal();
+    const {deptOver, direct} = calcWithDerivedShare(effectiveTotal);
 
-    const funderCoverage = getFunderCoverage(total, deptOver);
+    const funderCoverage = getFunderCoverage(effectiveTotal, deptOver);
 
     const coFinRaw = Math.max(0, deptOver - Math.min(deptOver, funderCoverage));
 
-    const ufAgg = sumUfAmount(activeScheme.uf_rules, total, years, deptOver, coFinRaw);
+    // UF rules use the base external grant as "total" (e.g. % of grant volume)
+    const ufAgg = sumUfAmount(activeScheme.uf_rules, base, years, deptOver, coFinRaw);
     const ufApplied = Math.min(ufAgg.amount, coFinRaw);
 
     const scale = ufAgg.amount > 0 ? (ufApplied / ufAgg.amount) : 0;
@@ -634,7 +691,10 @@
     // summary
     numbersDump.innerHTML = renderSummary({
       scheme: schemeSelect.options[schemeSelect.selectedIndex].text,
-      total,
+      schemeId: activeScheme.id,
+      baseTotal: base,
+      rjTopup,
+      effectiveTotal,
       years,
       deptOver,
       funderCoverage,
@@ -649,6 +709,14 @@
       ufByName: ufByNameScaled
     });
     summaryBox.classList.remove('hidden');
+  }
+
+  function showCoreSectionsAndReset(){
+    activeScheme = null;
+    staffFTERow.classList.add('hidden');
+    serviceRow.classList.add('hidden');
+    showCoreSections(false);
+    schemeInfo.innerHTML = describeScheme(null);
   }
 
   function resetAll(){
@@ -675,11 +743,8 @@
     if(schemeSelect.options.length>0){
       schemeSelect.selectedIndex = 0;
     }
-    activeScheme = null;
-    staffFTERow.classList.add('hidden');
-    serviceRow.classList.add('hidden');
-    showCoreSections(false);
-    schemeInfo.textContent = 'Start by choosing the grant scheme. The calculator will then show only the fields relevant for that scheme.';
+    showCoreSectionsAndReset();
+    updateLive();
   }
 
   // ---------- config load + UI build
@@ -714,8 +779,7 @@
         schemeSelect.appendChild(opt);
       });
 
-      activeScheme = null;
-      showCoreSections(false);
+      showCoreSectionsAndReset();
       updateLive();
     }catch(err){
       console.error('Config load failed', err);
@@ -738,8 +802,7 @@
       const opt=document.createElement('option');
       opt.value='vr'; opt.textContent='VR – fallback';
       schemeSelect.appendChild(opt);
-      activeScheme = null;
-      showCoreSections(false);
+      showCoreSectionsAndReset();
     }
   }
 
