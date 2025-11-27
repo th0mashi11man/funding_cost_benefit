@@ -515,10 +515,7 @@
       parts.push('<strong>Special rule:</strong> All indirect costs on service purchases must be covered by the department.');
     }
     if(sc.id === 'rj_programme' || sc.id === 'rj_project'){
-      parts.push('<strong>Special rule:</strong> The 170 000 SEK per FTE and year is added on top of the RJ grant amount and does not reduce the requested amount from RJ.');
-    }
-    if(sc.id === 'kaw_project'){
-      parts.push('<strong>Note:</strong> Applies to KAW “Forskningsprojekt av hög vetenskaplig potential” with central co-funding subject to internal approval.');
+      parts.push('<strong>Special rule:</strong> 170 000 SEK per FTE and year is added on top of the RJ grant amount and does not reduce the requested amount from RJ.');
     }
 
     return parts.join('<br>');
