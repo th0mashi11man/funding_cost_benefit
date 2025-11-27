@@ -23,90 +23,109 @@
   .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start}
   .help{font-size:.9rem;color:var(--muted)}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
-  button{background:var(--accent);color:#071225;font-weight:700;border:none;border-radius:10px;padding:12px 16px;cursor:pointer;font-size:1rem}
-  button.secondary{background:transparent;color:#9fb0c7;border:1px solid var(--border)}
-  .result{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px}
-  .tag{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-weight:700}
-  .ok{background:rgba(91,214,159,.12);color:var(--ok);border:1px solid rgba(91,214,159,.25)}
-  .warn{background:rgba(255,209,102,.12);color:var(--warn);border:1px solid rgba(255,209,102,.25)}
-  .bar{display:flex;height:48px;width:100%;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:10px}
-  .seg{display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;padding:0 6px;text-shadow:0 1px 2px rgba(0,0,0,.28)}
-  .s-over{background:var(--gold)} .s-other{background:var(--green)}
-  .s-sal{background:var(--blue)} .s-fac{background:var(--purple)} .s-cof{background:var(--red)}
-  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;margin-bottom:12px}
-  .legend-item{display:inline-flex;align-items:center;gap:6px;font-size:.9rem;color:#9fb0c7}
-  .legend-swatch{width:14px;height:14px;border-radius:3px;display:inline-block}
-  .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#0b1330;border:1px solid var(--border);color:#9fb0c7;font-size:.9rem}
-  .hidden{display:none}
-  .error{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.35);color:#ff9b9b}
-
-  /* Summary view */
-  .details-grid{display:grid;gap:10px}
+  button{background:var(--accent);color:#071225;font-weight:700;border:none;border-radius:999px;padding:9px 18px;font-size:.95rem;cursor:pointer}
+  button.secondary{background:transparent;color:var(--muted);border:1px solid var(--border)}
+  button:disabled{opacity:.6;cursor:not-allowed}
+  .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:var(--panel2);padding:4px 10px;font-size:.9rem;border:1px solid var(--border)}
+  .pill.error{background:rgba(255,107,107,0.08);border-color:rgba(255,107,107,0.6);color:#ffe3e3}
+  .hidden{display:none !important}
+  .tag{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;font-size:.85rem;font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+  .tag.ok{background:rgba(91,214,159,0.1);color:var(--ok);border:1px solid rgba(91,214,159,0.6)}
+  .tag.warn{background:rgba(255,209,102,0.08);color:var(--warn);border:1px solid rgba(255,209,102,0.7)}
+  .tag.bad{background:rgba(255,107,107,0.08);color:var(--bad);border:1px solid rgba(255,107,107,0.7)}
+  .bar-wrap{margin-top:14px}
+  .bar{display:flex;height:26px;border-radius:999px;overflow:hidden;border:1px solid var(--border);background:#050814;font-size:.8rem}
+  .bar span{display:flex;align-items:center;justify-content:center;padding:0 4px}
+  .bar .over{background:rgba(123,191,255,0.35)}
+  .bar .other{background:rgba(241,194,50,0.4)}
+  .bar .salary{background:rgba(147,196,125,0.6)}
+  .bar .fac{background:rgba(179,123,214,0.55)}
+  .bar .cofin{background:rgba(224,102,102,0.7)}
+  .legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;font-size:.8rem;color:var(--muted)}
+  .legend .pill{background:transparent}
+  .legend-key{width:10px;height:10px;border-radius:4px;margin-right:4px}
+  .l-over{background:rgba(123,191,255,0.9)}
+  .l-other{background:rgba(241,194,50,0.9)}
+  .l-salary{background:rgba(147,196,125,0.9)}
+  .l-fac{background:rgba(179,123,214,0.9)}
+  .l-cofin{background:rgba(224,102,102,0.9)}
+  .result{margin-top:14px}
+  .details-grid{display:grid;gap:10px;margin-top:10px}
   @media (min-width:820px){.details-grid.cols-2{grid-template-columns:1fr 1fr}}
-  .kv{display:grid;grid-template-columns:1fr auto;gap:6px 12px;padding:10px;border:1px solid var(--border);border-radius:10px;background:#0b1330}
+  .kv{display:grid;grid-template-columns:auto 1fr;column-gap:10px;row-gap:4px;font-size:.9rem}
   .kv .k{color:var(--muted)}
-  .kv .v{font-weight:700}
-  .section-title{margin:12px 0 6px;font-weight:800;color:#cfe2f5}
-  .summary-box{background:#0b1330;border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px}
+  .kv .v{text-align:right}
+  .section-title{font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:6px 0}
+  .footer{margin:18px 0 8px;font-size:.8rem;color:var(--muted)}
+  a{color:var(--accent)}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1 id="pageTitle"></h1>
+  <h1 id="pageTitle">Applied IT – Research Funding Financial Cost-Benefit Calculator</h1>
 
-  <!-- Overhead policy -->
   <div class="section">
-    <div class="row" style="justify-content:space-between;align-items:center">
-      <strong>Overhead policy</strong>
-      <span id="ohBadge" class="pill hidden"></span>
-    </div>
-    <div id="configWarn" class="pill error hidden" style="margin-top:8px">Couldn’t load <span class="mono">config.json</span>. Using fallback.</div>
-  </div>
-
-  <!-- Amount, years, scheme -->
-  <div class="section">
-    <div class="grid cols-2">
+    <div class="row" style="justify-content:space-between;align-items:center;gap:10px">
       <div>
-        <label for="requestedAmount">Amount for Applied IT (excl. funding for partners)</label>
-        <input id="requestedAmount" data-decimal="false" inputmode="numeric" placeholder="e.g., 10 000 000"/>
+        <strong>Overhead policy</strong>
+        <span id="ohBadge" class="pill hidden"></span>
       </div>
-      <div>
-        <label for="projectYears">Project duration (years)</label>
-        <input id="projectYears" data-decimal="false" inputmode="numeric" placeholder="e.g., 4"/>
-      </div>
-      <div>
-        <label for="schemeSelect">Grant scheme</label>
-        <select id="schemeSelect"></select>
-        <div class="help" id="schemeInfo"></div>
+      <div id="configWarn" class="pill error hidden" style="margin-left:auto">
+        Could not load <span class="mono">config.json</span>. Using fallback.
       </div>
     </div>
 
-    <div style="margin-top:10px">
-      <label>Available for direct costs (live)</label>
-      <div class="pill mono" id="availableDirectLine">—</div>
-    </div>
+    <!-- Amount, years, scheme -->
+    <div class="section">
+      <div class="grid cols-2">
+        <div>
+          <label for="requestedAmount">Amount for Applied IT (excl. funding for partners)</label>
+          <input id="requestedAmount" data-decimal="false" inputmode="numeric" placeholder="e.g., 10 000 000"/>
+        </div>
+        <div>
+          <label for="projectYears">Project duration (years)</label>
+          <input id="projectYears" data-decimal="false" inputmode="numeric" placeholder="e.g., 4"/>
+        </div>
+        <div>
+          <label for="staffFTE">Number of funded FTEs (for RJ etc.)</label>
+          <input id="staffFTE" data-decimal="true" placeholder="e.g., 1.5"/>
+        </div>
+        <div>
+          <label for="schemeSelect">Grant scheme</label>
+          <select id="schemeSelect"></select>
+          <div class="help" id="schemeInfo"></div>
+        </div>
+      </div>
 
-    <!-- Manual funder controls (only for "Other") -->
-    <div id="funderControls" class="grid cols-2" style="margin-top:10px">
-      <div>
-        <label for="funderModeSelect">Funder indirect cost coverage</label>
-        <select id="funderModeSelect">
-          <option value="percent_overhead" selected>% of overhead</option>
-          <option value="absolute">Fixed amount</option>
-          <option value="percent_total">% of total</option>
-        </select>
+      <div style="margin-top:10px">
+        <label>Available for direct costs (live)</label>
+        <div class="pill mono" id="availableDirectLine">—</div>
       </div>
-      <div id="funderPercentOverBox">
-        <label for="funderPercentOverhead">Coverage (% of overhead)</label>
-        <input id="funderPercentOverhead" data-decimal="true" placeholder="e.g., 100"/>
-      </div>
-      <div id="funderAbsoluteBox" class="hidden">
-        <label for="funderOverheadAbsolute">Coverage (absolute)</label>
-        <input id="funderOverheadAbsolute" data-decimal="false" inputmode="numeric" placeholder="e.g., 150 000"/>
-      </div>
-      <div id="funderPercentTotalBox" class="hidden">
-        <label for="funderOverheadPercent">Coverage (% of total)</label>
-        <input id="funderOverheadPercent" data-decimal="true" placeholder="e.g., 25"/>
+
+      <!-- Manual funder controls (only for "Other") -->
+      <div id="funderControls" class="grid cols-2" style="margin-top:10px">
+        <div>
+          <label for="funderModeSelect">Funder indirect cost coverage</label>
+          <select id="funderModeSelect">
+            <option value="percent_overhead" selected>% of overhead</option>
+            <option value="absolute">Fixed amount</option>
+            <option value="percent_total">% of total</option>
+          </select>
+        </div>
+        <div>
+          <div id="funderPercentOverBox">
+            <label for="funderPercentOverhead">% of overhead covered</label>
+            <input id="funderPercentOverhead" data-decimal="true" placeholder="e.g., 75"/>
+          </div>
+          <div id="funderAbsoluteBox" class="hidden">
+            <label for="funderOverheadAbsolute">Fixed amount for indirect costs</label>
+            <input id="funderOverheadAbsolute" data-decimal="false" inputmode="numeric" placeholder="e.g., 1 000 000"/>
+          </div>
+          <div id="funderPercentTotalBox" class="hidden">
+            <label for="funderOverheadPercent">% of total grant for indirect costs</label>
+            <input id="funderOverheadPercent" data-decimal="true" placeholder="e.g., 20"/>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -122,6 +141,14 @@
       <div>
         <label for="existingSalaries">…of which salary for existing staff</label>
         <input id="existingSalaries" data-decimal="false" inputmode="numeric" placeholder="e.g., 6 000 000"/>
+      </div>
+      <div>
+        <label for="servicePurchases">Service purchases (consultants, subcontracting, evaluation)</label>
+        <input id="servicePurchases" data-decimal="false" inputmode="numeric" placeholder="e.g., 500 000"/>
+        <div class="help">
+          For EU–Horizon, do <strong>not</strong> include this amount in the main
+          “Amount for Applied IT” above. It is fully department-financed and not subject to OH.
+        </div>
       </div>
       <div>
         <label>Available for other direct costs (live)</label>
@@ -141,28 +168,31 @@
       <div id="resultTag" class="tag warn">Result pending…</div>
       <p id="resultExplanation" class="help" style="margin:8px 0 0"></p>
 
-      <div class="bar hidden" id="barContainer">
-        <div class="seg s-over"  id="overheadBar"></div>
-        <div class="seg s-other" id="otherBar"></div>
-        <div class="seg s-sal"   id="salaryBar"></div>
-        <div class="seg s-fac"   id="facBar"></div>
-        <div class="seg s-cof"   id="cofinBar"></div>
+      <div class="bar-wrap">
+        <div class="bar hidden" id="barContainer">
+          <span class="over" id="overheadBar"></span>
+          <span class="other" id="otherBar"></span>
+          <span class="salary" id="salaryBar"></span>
+          <span class="fac" id="facBar"></span>
+          <span class="cofin" id="cofinBar"></span>
+        </div>
+        <div class="legend hidden" id="legend">
+          <span class="pill" id="leg-over"><span class="legend-key l-over"></span>Overhead covered by funder</span>
+          <span class="pill" id="leg-other"><span class="legend-key l-other"></span>Other direct costs</span>
+          <span class="pill" id="leg-salary"><span class="legend-key l-salary"></span>Existing staff salaries covered</span>
+          <span class="pill" id="leg-fac"><span class="legend-key l-fac"></span>Univ/Faculty contribution</span>
+          <span class="pill" id="leg-cofin"><span class="legend-key l-cofin"></span>Departmental co-financing</span>
+        </div>
       </div>
 
-      <div class="legend hidden" id="legend">
-        <span class="legend-item" id="leg-over"><span class="legend-swatch" style="background:var(--gold)"></span>Indirect (funder)</span>
-        <span class="legend-item" id="leg-other"><span class="legend-swatch" style="background:var(--green)"></span>Other direct</span>
-        <span class="legend-item" id="leg-salary"><span class="legend-swatch" style="background:var(--blue)"></span>Existing salaries</span>
-        <span class="legend-item" id="leg-fac"><span class="legend-swatch" style="background:var(--purple)"></span>Univ/Fac contribution</span>
-        <span class="legend-item" id="leg-cofin"><span class="legend-swatch" style="background:var(--red)"></span>Dept co-financing</span>
-      </div>
-
-      <!-- Summary (always visible after calculation) -->
-      <div class="summary-box hidden" id="summaryBox">
-        <h3 class="section-title" style="margin-top:0;">Summary</h3>
+      <div class="section" id="summaryBox" style="margin-top:14px;display:none">
         <div id="numbersDump"></div>
       </div>
     </div>
+  </div>
+
+  <div class="footer">
+    <div>NB: This tool is illustrative and depends on current GU/Faculty rules. Always verify with the faculty finance office before submitting applications.</div>
   </div>
 </div>
 
@@ -183,11 +213,11 @@
     const lastComma=u.lastIndexOf(',');
     const lastDot=u.lastIndexOf('.');
     let decSep=null;
-    if(lastComma>=0 || lastDot>=0) decSep = (lastComma>lastDot)?',':'.';
+    if(lastComma>lastDot) decSep=',';
+    else if(lastDot>lastComma) decSep='.';
     if(decSep){
-      // unify thousands to spaces then remove them; keep one decimal sep
-      u = u.replace(decSep==='.'?/,/g:/\./g,'');
-      const i = u.indexOf(decSep);
+      // split into integer and decimal parts
+      const i = u.lastIndexOf(decSep);
       const ip = u.slice(0,i).replace(/[^\d]/g,'');
       const dp = u.slice(i+1).replace(/[^\d]/g,'');
       return (neg?-1:1)*Number(ip+'.'+dp || '0');
@@ -219,7 +249,7 @@
   function attachFormatters(){
     document.querySelectorAll('input[data-decimal]').forEach(el=>{
       el.addEventListener('input', ()=>{ formatNumericInput(el); updateLive(); });
-      el.addEventListener('blur',  ()=>{ formatNumericInput(el); updateLive(); });
+      el.addEventListener('blur', ()=>{ formatNumericInput(el); updateLive(); });
     });
   }
 
@@ -228,6 +258,7 @@
   // ---------- elements
   const pageTitle=$('pageTitle'), ohBadge=$('ohBadge'), configWarn=$('configWarn');
   const requestedAmount=$('requestedAmount'), projectYears=$('projectYears');
+  const staffFTE=$('staffFTE');
   const schemeSelect=$('schemeSelect'), schemeInfo=$('schemeInfo');
 
   const funderControls=$('funderControls');
@@ -235,6 +266,7 @@
   const funderPercentOverBox=$('funderPercentOverBox');
   const funderAbsoluteBox=$('funderAbsoluteBox');
   const funderPercentTotalBox=$('funderPercentTotalBox');
+
   const funderPercentOverhead=$('funderPercentOverhead');
   const funderOverheadAbsolute=$('funderOverheadAbsolute');
   const funderOverheadPercent=$('funderOverheadPercent');
@@ -242,6 +274,7 @@
   const availableDirectLine=$('availableDirectLine');
   const availableOtherLine=$('availableOtherLine');
   const plannedSalaryDirect=$('plannedSalaryDirect'), existingSalaries=$('existingSalaries');
+  const servicePurchases=$('servicePurchases');
 
   const resultContainer=$('resultContainer'), resultTag=$('resultTag'), resultExplanation=$('resultExplanation');
   const barContainer=$('barContainer'), legend=$('legend');
@@ -255,35 +288,69 @@
   let lastShare=0.5;
 
   // ---------- UF rules engine
-  function computeUfAmount(rule, total, years){
+  function computeUfAmount(rule, total, years, deptOver, coFinRaw){
     const yrs = Math.max(1, Math.round(num(years)));
     if(!rule || !rule.mode) return 0;
-    if(rule.mode === 'percent_total'){
-      const p = Number(rule.value || 0)/100;
-      return Math.max(0, Math.round(total * p));
+    const mode = rule.mode;
+
+    if(mode === 'fixed'){
+      const a = Number(rule.amount || 0);
+      return Math.max(0, Math.round(a));
     }
-    if(rule.mode === 'fixed_per_year'){
+
+    if(mode === 'fixed_per_year'){
       const a = Number(rule.amount_per_year || 0);
       return Math.max(0, Math.round(a * yrs));
     }
-    if(rule.mode === 'percent_total_capped_per_year'){
-      const p = Number(rule.value || 0)/100;
+
+    if(mode === 'percent_total'){
+      const p = Number(rule.value || 0) / 100;
+      return Math.max(0, Math.round(total * p));
+    }
+
+    if(mode === 'percent_overhead'){
+      const p = Number(rule.value || 0) / 100;
+      return Math.max(0, Math.round(deptOver * p));
+    }
+
+    if(mode === 'percent_total_capped_per_year'){
+      const p = Number(rule.value || 0) / 100;
       const cap = Number(rule.per_year_cap || 0);
       const raw = total * p;
       const capped = Math.min(raw, cap * yrs);
       return Math.max(0, Math.round(capped));
     }
+
+    // 170k SEK per FTE and year (RJ etc.)
+    if(mode === 'per_fte_per_year'){
+      const a = Number(rule.amount_per_year || 0);
+      const fte = Math.max(0, Number(num(staffFTE.value)));
+      return Math.max(0, Math.round(a * fte * yrs));
+    }
+
+    // share of OH gap (deptOver minus funder coverage)
+    if(mode === 'oh_gap_share'){
+      const share = Number(rule.value || 0) / 100; // 0–1
+      const base = Math.max(0, Number(coFinRaw || 0));
+      return Math.max(0, Math.round(base * share));
+    }
+
     return 0;
   }
-  function sumUfAmount(rules, total, years){
-    if(!Array.isArray(rules) || rules.length===0) return {amount:0, note:''};
+
+  function sumUfAmount(rules, total, years, deptOver, coFinRaw){
+    if(!Array.isArray(rules) || rules.length===0) return {amount:0, note:'', byName:{}};
     let sum=0, notes=[];
+    const byName = {};
     for(const r of rules){
-      const a = computeUfAmount(r, total, years);
+      const a = computeUfAmount(r, total, years, deptOver, coFinRaw);
       sum += a;
       notes.push(r.notes || r.name || r.mode);
+      if(r.name){
+        byName[r.name] = (byName[r.name] || 0) + a;
+      }
     }
-    return {amount: sum, note: notes.join(' + ')};
+    return {amount: sum, note: notes.join(' + '), byName};
   }
 
   // ---------- salary clamping
@@ -310,18 +377,20 @@
       const a = activeScheme.funder.value ?? num(funderOverheadAbsolute.value);
       return Math.max(0, Math.min(Math.round(a), total));
     }
-    if(mode==='manual'){ // "Other"
+    if(mode==='manual'){
       const m = funderModeSelect.value;
       if(m==='percent_overhead'){
         const p = num(funderPercentOverhead.value);
         return Math.round(deptOver * Math.max(0, Math.min(p,100)) / 100);
-      }else if(m==='percent_total'){
+      }
+      if(m==='absolute'){
+        const a = num(funderOverheadAbsolute.value);
+        return Math.max(0, Math.min(Math.round(a), total));
+      }
+      if(m==='percent_total'){
         const p = num(funderOverheadPercent.value);
         const dec = Math.max(0, Math.min(p,500))/100;
         return Math.round(total * (dec/(1+dec)));
-      }else{ // absolute
-        const a = num(funderOverheadAbsolute.value);
-        return Math.max(0, Math.min(Math.round(a), total));
       }
     }
     return 0; // none
@@ -355,49 +424,33 @@
     funderPercentTotalBox.classList.toggle('hidden', !(isOther && mode==='percent_total'));
   }
 
-  function applyScheme(){
-    const id = schemeSelect.value;
-    activeScheme = SCHEMES[id];
-    if(!activeScheme){ return; }
-
-    if(id==='other'){
-      schemeInfo.textContent = '';
-      schemeInfo.classList.add('hidden');
-    }else{
-      const label = activeScheme.funder.label || '—';
-      const hasUf = Array.isArray(activeScheme.uf_rules) && activeScheme.uf_rules.length>0;
-      const ufText = hasUf
-        ? 'Univ/Faculty: ' + activeScheme.uf_rules.map(r=>r.notes || r.name || r.mode).join(' + ')
-        : '';
-      let text = `Funder: ${label}.`;
-      if(hasUf) text += ' ' + ufText;
-      schemeInfo.textContent = text;
-      schemeInfo.classList.remove('hidden');
-    }
-
-    toggleFunderInputs();
-    updateLive();
-  }
-
   function updateLive(){
-    const total=Math.round(num(requestedAmount.value));
-    if(total<=0){
-      availableDirectLine.textContent='—';
-      availableOtherLine.textContent='—';
-      return;
-    }
+    const total = Math.round(num(requestedAmount.value));
     const {deptOver, direct} = calcWithDerivedShare(total);
     availableDirectLine.textContent = fmt(direct);
-    clampSalaryInputs(direct);
-    const planned = Math.max(0, Math.round(num(plannedSalaryDirect.value)));
-    const otherLive = Math.max(0, direct - planned);
-    availableOtherLine.textContent = fmt(otherLive);
+    const plannedSal = Math.max(0, Math.round(num(plannedSalaryDirect.value)));
+    const other = Math.max(0, direct - plannedSal);
+    availableOtherLine.textContent = fmt(other);
   }
 
-  // ---------- Summary renderer
+  function applyScheme(){
+    const id = schemeSelect.value;
+    activeScheme = SCHEMES[id] || SCHEMES['vr'];
+    const f = activeScheme.funder;
+    const label = f.label || '';
+    const parts = [id.toUpperCase(), label].filter(Boolean).join(' – ');
+    schemeInfo.textContent = parts;
+    toggleFunderInputs();
+  }
+
   function renderSummary(d){
     const row=(l,v)=>(v>0||v===0)?`<div class="k">${l}</div><div class="v mono">${fmt(v)}</div>`:'';
     const text=(l,v)=>`<div class="k">${l}</div><div class="v">${v}</div>`;
+
+    const rector = d.ufByName && d.ufByName['Rektor'] ? d.ufByName['Rektor'] : 0;
+    const faculty = d.ufByName && d.ufByName['Faculty (NT)'] ? d.ufByName['Faculty (NT)'] : 0;
+    const otherUF = d.ufByName ? Object.entries(d.ufByName).filter(([name])=>name!=='Rektor' && name!=='Faculty (NT)').reduce((acc,[,val])=>acc+val,0) : 0;
+
     return `
     <div class="details-grid cols-2">
       <div>
@@ -407,24 +460,33 @@
           ${row('Amount for Applied IT', d.total)}
           ${text('Project duration', d.years + ' year(s)')}
         </div>
+
         <div class="section-title">Indirect costs & coverage</div>
         <div class="kv">
           ${row('Department overhead (cascading)', d.deptOver)}
           ${row('Funder indirect coverage', d.funderCoverage)}
-          ${d.ufApplied>0 ? row('Univ/Faculty contribution', d.ufApplied) : ''}
+          ${d.ufApplied>0 ? row('Univ/Faculty contribution (total)', d.ufApplied) : ''}
+          ${rector ? row('…of which Rektor', rector) : ''}
+          ${faculty ? row('…of which Faculty (NT)', faculty) : ''}
+          ${otherUF ? row('…other UF contributions', otherUF) : ''}
         </div>
       </div>
+
       <div>
         <div class="section-title">Direct costs</div>
         <div class="kv">
           ${row('Direct funds available', d.direct)}
           ${row('Planned salary costs', d.plannedSal)}
           ${row('…of which existing staff salaries', d.userSalaries)}
-          ${row('Other direct costs', d.other)}
+          ${row('Other direct costs (non-service)', d.other)}
+          ${row('Service purchases (dept-funded, no OH)', d.deptService)}
         </div>
+
         <div class="section-title">Departmental co-financing needed</div>
         <div class="kv">
-          ${row('Departmental co-financing needed', d.coFinNet)}
+          ${row('Dept co-financing for OH gap', d.coFinNetOH)}
+          ${row('Dept co-financing for service purchases', d.deptService)}
+          ${row('Total departmental co-financing', d.coFinNetTotal)}
         </div>
       </div>
     </div>`;
@@ -439,45 +501,80 @@
     // funder coverage
     const funderCoverage = getFunderCoverage(total, deptOver);
 
-    // dept co-finance before UF
+    // dept co-finance before Univ/Faculty
     const coFinRaw = Math.max(0, deptOver - Math.min(deptOver, funderCoverage));
 
     // UF contribution (sum of rules; applied up to coFinRaw)
-    const ufAgg = sumUfAmount(activeScheme.uf_rules, total, years);
+    const ufAgg = sumUfAmount(activeScheme.uf_rules, total, years, deptOver, coFinRaw);
     const ufApplied = Math.min(ufAgg.amount, coFinRaw);
 
-    // final dept co-finance
-    const coFinNet = Math.max(0, coFinRaw - ufApplied);
+    // If UF rules exceed coFinRaw, scale them down proportionally for breakdown
+    const scale = ufAgg.amount > 0 ? (ufApplied / ufAgg.amount) : 0;
+    const ufByNameScaled = {};
+    for (const [name, val] of Object.entries(ufAgg.byName || {})) {
+      ufByNameScaled[name] = Math.round(val * scale);
+    }
+
+    // Final dept co-finance for overhead gap
+    const coFinNetOH = Math.max(0, coFinRaw - ufApplied);
 
     clampSalaryInputs(direct);
     const plannedSal = Math.max(0, Math.round(num(plannedSalaryDirect.value)));
     const userSalaries = Math.max(0, Math.round(num(existingSalaries.value)));
     const other = Math.max(0, direct - plannedSal);
 
+    // Service purchases – fully dept-funded (no OH), especially relevant for Horizon
+    const service = Math.max(0, Math.round(num(servicePurchases.value || 0)));
+    let deptService = 0;
+    if (activeScheme && activeScheme.id === 'horizon' && service > 0) {
+      deptService = service;
+    }
+
+    const coFinNetTotal = coFinNetOH + deptService;
+
     // Verdict tag
     let cls='warn', txt='UNCLEAR cost-benefit advantage';
-    let expl=`Department co-financing cost after Univ/Faculty contribution (${fmt(coFinNet)}) is greater than coverage of existing-salary costs (${fmt(userSalaries)}).`;
-    if(userSalaries>coFinNet){
+    let expl=`Department co-financing cost after Univ/Faculty contribution (${fmt(coFinNetTotal)}) is comparable to coverage of existing-salary costs (${fmt(userSalaries)}).`;
+    if(userSalaries>coFinNetTotal){
       cls='ok'; txt='CLEAR cost-benefit advantage';
-      expl=`Coverage of existing-salary costs (${fmt(userSalaries)}) exceeds department co-financing cost after Univ/Faculty contribution (${fmt(coFinNet)}).`;
-    } else if(userSalaries===coFinNet){
+      expl=`Coverage of existing-salary costs (${fmt(userSalaries)}) is greater than departmental co-financing cost after Univ/Faculty contribution (${fmt(coFinNetTotal)}).`;
+    } else if(userSalaries===coFinNetTotal){
       cls='warn'; txt='BREAK-EVEN';
-      expl=`Coverage of existing-salary costs equals department co-financing cost after Univ/Faculty contribution (${fmt(coFinNet)}).`;
+      expl=`Coverage of existing-salary costs equals departmental co-financing cost after Univ/Faculty contribution (${fmt(coFinNetTotal)}).`;
     }
-    resultTag.className='tag '+cls; resultTag.textContent=txt; resultExplanation.textContent=expl;
+    resultTag.className='tag '+cls;
+    resultTag.textContent=txt;
+    resultExplanation.textContent=expl;
     resultContainer.classList.remove('hidden');
 
     // Bar/legend (hide zero-value segments)
-    const vals = { used: Math.min(deptOver, funderCoverage), other, userSalaries, facUsed: ufApplied, coFinNet };
+    const vals = {
+      used: Math.min(deptOver, funderCoverage),
+      other,
+      userSalaries,
+      facUsed: ufApplied,
+      coFinNet: coFinNetTotal
+    };
     const sum = Object.values(vals).reduce((a,b)=>a+b,0);
-    if(sum<=0){ barContainer.classList.add('hidden'); legend.classList.add('hidden'); }
-    else{
-      barContainer.classList.remove('hidden'); legend.classList.remove('hidden');
+    if(sum<=0){
+      barContainer.classList.add('hidden');
+      legend.classList.add('hidden');
+    } else {
+      barContainer.classList.remove('hidden');
+      legend.classList.remove('hidden');
       const frac = x => x>0 ? x/sum : 0;
       function seg(barEl, legId, val){
         const legEl = document.getElementById(legId);
-        if(val>0){ barEl.style.display='flex'; barEl.style.flex=String(frac(val)); barEl.textContent=fmt(val); legEl.style.display='inline-flex'; }
-        else { barEl.style.display='none'; barEl.textContent=''; legEl.style.display='none'; }
+        if(val>0){
+          barEl.style.display='flex';
+          barEl.style.flex=String(frac(val));
+          barEl.textContent=fmt(val);
+          legEl.style.display='inline-flex';
+        } else {
+          barEl.style.display='none';
+          barEl.textContent='';
+          legEl.style.display='none';
+        }
       }
       seg(bars.overhead, 'leg-over',  vals.used);
       seg(bars.other,    'leg-other', vals.other);
@@ -489,30 +586,44 @@
     // Summary (always show after calc)
     numbersDump.innerHTML = renderSummary({
       scheme: schemeSelect.options[schemeSelect.selectedIndex].text,
-      total, years,
+      total,
+      years,
       deptOver,
       funderCoverage,
       direct,
       plannedSal,
       userSalaries,
       other,
-      coFinNet,
-      ufApplied
+      coFinNetOH,
+      deptService,
+      coFinNetTotal,
+      ufApplied,
+      ufByName: ufByNameScaled
     });
     summaryBox.classList.remove('hidden');
   }
 
   function resetAll(){
-    requestedAmount.value=''; projectYears.value='';
+    requestedAmount.value='';
+    projectYears.value='';
+    staffFTE.value='';
     const defId = (CONFIG?.defaultScheme) || 'vr';
     const defIndex = Array.from(schemeSelect.options).findIndex(o=>o.value===defId);
     schemeSelect.selectedIndex = defIndex>=0 ? defIndex : 0;
     funderModeSelect.value='percent_overhead';
-    funderPercentOverhead.value=''; funderOverheadAbsolute.value=''; funderOverheadPercent.value='';
-    plannedSalaryDirect.value=''; existingSalaries.value='';
-    availableDirectLine.textContent='—'; availableOtherLine.textContent='—';
-    resultContainer.classList.add('hidden'); barContainer.classList.add('hidden'); legend.classList.add('hidden');
-    summaryBox.classList.add('hidden'); numbersDump.innerHTML='';
+    funderPercentOverhead.value='';
+    funderOverheadAbsolute.value='';
+    funderOverheadPercent.value='';
+    plannedSalaryDirect.value='';
+    existingSalaries.value='';
+    servicePurchases.value='';
+    availableDirectLine.textContent='—';
+    availableOtherLine.textContent='—';
+    resultContainer.classList.add('hidden');
+    barContainer.classList.add('hidden');
+    legend.classList.add('hidden');
+    summaryBox.classList.add('hidden');
+    numbersDump.innerHTML='';
     lastShare=0.5;
     applyScheme();
   }
@@ -528,71 +639,63 @@
       const lbl = CONFIG.overhead?.label || '';
       const sal = CONFIG.overhead?.salary_percent ?? 0;
       const oth = CONFIG.overhead?.other_percent ?? 0;
-      ohBadge.innerHTML = `${lbl}: <span class="mono">${sal}%</span> on salaries · <span class="mono">${oth}%</span> on other costs`;
-      ohBadge.classList.remove('hidden');
-    }catch(e){
-      // fallback to embedded config for local file:// use
+      salaryOH = sal/100;
+      otherOH = oth/100;
+      if(lbl){
+        ohBadge.textContent = `OH ${lbl}: salary ${sal}%, other ${oth}%`;
+        ohBadge.classList.remove('hidden');
+      }
+      SCHEMES = {};
+      for(const s of CONFIG.schemes){
+        SCHEMES[s.id] = s;
+      }
+      schemeSelect.innerHTML='';
+      CONFIG.schemes.forEach(s=>{
+        const opt=document.createElement('option');
+        opt.value=s.id; opt.textContent=s.name;
+        schemeSelect.appendChild(opt);
+      });
+      const o=document.createElement('option'); o.value='other'; o.textContent='Other'; schemeSelect.appendChild(o);
+
+      const defId = CONFIG.defaultScheme || 'vr';
+      const defIndex = Array.from(schemeSelect.options).findIndex(x=>x.value===defId);
+      schemeSelect.selectedIndex = defIndex>=0 ? defIndex : 0;
+
+      applyScheme();
+      updateLive();
+    }catch(err){
+      console.error('Config load failed', err);
       configWarn.classList.remove('hidden');
-      const embedded = document.getElementById('embedded-config');
-      if(embedded?.textContent){
-        try{ CONFIG = JSON.parse(embedded.textContent); }catch{ CONFIG=null; }
-      }
-      if(!CONFIG){
-        // minimal fallback so the page still works locally
-        CONFIG = {
-          title: "Research Funding Financial Cost-Benefit Calculator",
-          overhead: { label: "", salary_percent: 62, other_percent: 52 },
-          defaultScheme: "vr",
-          schemes: [
-            { id:'vr', name:'VR – Swedish Research Council', funder:{mode:'percent_overhead', value:100, label:'Covers all overhead costs'}, uf_rules:[] },
-            { id:'other', name:'Other', funder:{mode:'manual', value:null, label:'Manual entry'}, uf_rules:[] }
-          ]
-        };
-      }
-      // keep badge if we have overhead info even from fallback
-      const lbl = CONFIG.overhead?.label || '';
-      const sal = CONFIG.overhead?.salary_percent ?? 0;
-      const oth = CONFIG.overhead?.other_percent ?? 0;
-      if(lbl || sal || oth){ ohBadge.innerHTML = `${lbl}: <span class="mono">${sal}%</span> on salaries · <span class="mono">${oth}%</span> on other costs`; ohBadge.classList.remove('hidden'); }
+      CONFIG = {
+        overhead:{label:'fallback',salary_percent:54,other_percent:45},
+        defaultScheme:'vr',
+        schemes:[
+          {id:'vr',name:'VR – fallback',funder:{mode:'percent_overhead',value:100,label:'Covers all overhead costs'},uf_rules:[]}
+        ]
+      };
+      SCHEMES = { vr: CONFIG.schemes[0] };
+      const opt=document.createElement('option');
+      opt.value='vr'; opt.textContent='VR – fallback';
+      schemeSelect.appendChild(opt);
+      applyScheme();
     }
-
-    // internal OH
-    salaryOH = Number(CONFIG.overhead?.salary_percent ?? 62)/100;
-    otherOH  = Number(CONFIG.overhead?.other_percent ?? 52)/100;
-
-    // build scheme map
-    SCHEMES = {};
-    (CONFIG.schemes||[]).forEach(s=>{
-      SCHEMES[s.id] = { name:s.name, funder:s.funder||{mode:'none',value:0,label:'—'}, uf_rules:Array.isArray(s.uf_rules)?s.uf_rules:[] };
-    });
-    if(!SCHEMES['other']) SCHEMES['other'] = { name:'Other', funder:{mode:'manual',value:null,label:'Manual entry'}, uf_rules:[] };
-
-    // page title
-    pageTitle.textContent = CONFIG.title || "Research Funding Financial Cost-Benefit Calculator";
-
-    // build select: all except Other, then Other last; default = CONFIG.defaultScheme
-    schemeSelect.innerHTML = '';
-    (CONFIG.schemes||[]).filter(s=>s.id!=='other').forEach(s=>{
-      const o=document.createElement('option'); o.value=s.id; o.textContent=s.name; schemeSelect.appendChild(o);
-    });
-    const o=document.createElement('option'); o.value='other'; o.textContent='Other'; schemeSelect.appendChild(o);
-
-    const defId = CONFIG.defaultScheme || 'vr';
-    const defIndex = Array.from(schemeSelect.options).findIndex(x=>x.value===defId);
-    schemeSelect.selectedIndex = defIndex>=0 ? defIndex : 0;
-
-    applyScheme();
-    updateLive();
   }
 
   // ---------- events
   function attachLogicListeners(){
     document.querySelectorAll('input[data-decimal]').forEach(el=>{
       el.addEventListener('input', ()=>{ formatNumericInput(el); updateLive(); });
-      el.addEventListener('blur',  ()=>{ formatNumericInput(el); updateLive(); });
+      el.addEventListener('blur', ()=>{ formatNumericInput(el); updateLive(); });
     });
-    funderModeSelect.addEventListener('change', ()=>{toggleFunderInputs(); updateLive();});
-    schemeSelect.addEventListener('change', applyScheme);
+    schemeSelect.addEventListener('change', ()=>{ applyScheme(); updateLive(); });
+    funderModeSelect.addEventListener('change', ()=>{ toggleFunderInputs(); updateLive(); });
+    ['funderPercentOverhead','funderOverheadAbsolute','funderOverheadPercent'].forEach(id=>{
+      const el=$(id);
+      el.addEventListener('input', ()=>{ formatNumericInput(el); updateLive(); });
+      el.addEventListener('blur', ()=>{ formatNumericInput(el); updateLive(); });
+    });
+    plannedSalaryDirect.addEventListener('input', updateLive);
+    existingSalaries.addEventListener('input', updateLive);
     $('calcBtn').addEventListener('click', calculate);
     $('resetBtn').addEventListener('click', resetAll);
   }
@@ -603,11 +706,6 @@
     attachLogicListeners();
     loadConfig();
   })();
-</script>
-
-<!-- Optional embedded fallback for local file:// testing; paste your config.json here -->
-<script id="embedded-config" type="application/json">
-{}
 </script>
 </body>
 </html>
