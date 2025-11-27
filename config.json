@@ -39,8 +39,8 @@
     },
 
     {
-      "id": "kaw_project",
-      "name": "KAW – Forskningsprojekt av hög vetenskaplig potential",
+      "id": "kaw_potential",
+      "name": "KAW – Research project of high scientific value",
       "funder": {
         "mode": "percent_overhead",
         "value": 20,
@@ -59,6 +59,23 @@
           "value": 5,
           "per_year_cap": 1000000,
           "notes": "Faculty 5% (max 1M/yr)"
+        }
+      ]
+    },
+    {
+      "id": "kaw_project",
+      "name": "KAW – Projects",
+      "funder": {
+        "mode": "percent_overhead",
+        "value": 20,
+        "label": "Up to 20% for indirect costs"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "percent_total",
+          "value": 25,
+          "notes": "VC 25% of total"
         }
       ]
     },
