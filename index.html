@@ -152,7 +152,7 @@
         <label for="servicePurchases">Service purchases (consultants, subcontracting, evaluation)</label>
         <input id="servicePurchases" data-decimal="false" inputmode="numeric" placeholder="e.g., 500 000"/>
         <div class="help">
-          For EU–Horizon, this amount is part of the Applied IT budget. The department must co-finance 100% of the overhead on these costs.
+          The department must co-finance 100% of the overhead on these costs.
         </div>
       </div>
       <div>
@@ -515,10 +515,10 @@
 
     // 3) Structural scheme-specific clarifications
     if(sc.id === 'horizon'){
-      parts.push('<strong>Special rule:</strong> All indirect costs on service purchases must be covered by the department.');
+      parts.push('<strong>Special rule:</strong> All indirect costs on service purchases must be covered by the department');
     }
     if(sc.id === 'rj_programme' || sc.id === 'rj_project'){
-      parts.push('<strong>Special rule:</strong> 170 000 SEK per FTE and year is added on top of the RJ grant amount and does not reduce the requested amount from RJ.');
+      parts.push('<strong>Special rule:</strong> 170 000 SEK per FTE and year is added on top of the RJ grant amount and does not reduce the requested amount from RJ');
     }
 
     return parts.join('<br>');
