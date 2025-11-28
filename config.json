@@ -13,7 +13,7 @@
       "funder": {
         "mode": "percent_overhead",
         "value": 100,
-        "label": "Covers all overhead costs"
+        "label": "All overhead costs"
       },
       "uf_rules": []
     },
@@ -23,20 +23,20 @@
       "funder": {
         "mode": "percent_overhead",
         "value": 100,
-        "label": "Covers all overhead costs"
+        "label": "All overhead costs"
       },
       "uf_rules": [
         {
           "name": "Vice Chancellor",
           "mode": "percent_total",
           "value": 25,
-          "notes": "VC 25% of total"
+          "notes": "25% of total"
         },
         {
           "name": "Faculty (NT)",
           "mode": "percent_total",
           "value": 25,
-          "notes": "Faculty 25% of total"
+          "notes": "25% of total"
         }
       ]
     },
@@ -46,7 +46,7 @@
       "funder": {
         "mode": "percent_overhead",
         "value": 100,
-        "label": "Covers all overhead costs"
+        "label": "All overhead costs"
       },
       "uf_rules": []
     },
@@ -56,7 +56,7 @@
       "funder": {
         "mode": "percent_overhead",
         "value": 100,
-        "label": "Covers all overhead costs"
+        "label": "All overhead costs"
       },
       "uf_rules": []
     },
@@ -74,14 +74,14 @@
           "name": "Vice Chancellor",
           "mode": "percent_total",
           "value": 25,
-          "notes": "VC 25% of total"
+          "notes": "25% of total"
         },
         {
           "name": "Faculty (NT)",
           "mode": "percent_total_capped_per_year",
           "value": 5,
           "per_year_cap": 1000000,
-          "notes": "Faculty 5% (max 1M/yr)"
+          "notes": "5% of total (max 1M/yr)"
         }
       ]
     },
@@ -98,14 +98,14 @@
           "name": "Vice Chancellor",
           "mode": "percent_total",
           "value": 25,
-          "notes": "VC 25% of total"
+          "notes": "25% of total"
         },
         {
           "name": "Faculty (NT)",
           "mode": "percent_total_capped_per_year",
           "value": 5,
           "per_year_cap": 1000000,
-          "notes": "Faculty 5% (max 1M/yr)"
+          "notes": "5% of total (max 1M/yr)"
         }
       ]
     },
@@ -122,14 +122,14 @@
           "name": "Vice Chancellor",
           "mode": "percent_total",
           "value": 25,
-          "notes": "VC 25% of total"
+          "notes": "25% of total"
         },
         {
           "name": "Faculty (NT)",
           "mode": "percent_total_capped_per_year",
           "value": 5,
           "per_year_cap": 1000000,
-          "notes": "Faculty 5% (max 1M/yr)"
+          "notes": "5% of total (max 1M/yr)"
         }
       ]
     },
@@ -146,13 +146,13 @@
           "name": "Vice Chancellor",
           "mode": "percent_total",
           "value": 25,
-          "notes": "VC 25% of total"
+          "notes": "25% of total"
         },
         {
           "name": "Faculty (NT)",
           "mode": "percent_total",
           "value": 5,
-          "notes": "Faculty 5% of total"
+          "notes": "5% of total"
         }
       ]
     },
@@ -169,7 +169,7 @@
           "name": "Vice Chancellor",
           "mode": "percent_total",
           "value": 25,
-          "notes": "VC 25% of total"
+          "notes": "25% of total"
         }
       ]
     },
@@ -186,7 +186,7 @@
           "name": "Vice Chancellor",
           "mode": "percent_total",
           "value": 25,
-          "notes": "VC 25% of total"
+          "notes": "25% of total"
         }
       ]
     },
@@ -204,13 +204,13 @@
           "name": "Vice Chancellor",
           "mode": "fixed_per_year",
           "amount_per_year": 750000,
-          "notes": "VC 750k/yr"
+          "notes": "750tkr/yr"
         },
         {
           "name": "Faculty (NT)",
           "mode": "fixed_per_year",
           "amount_per_year": 250000,
-          "notes": "Faculty 250k/yr"
+          "notes": "F250tkr/yr"
         }
       ]
     },
@@ -228,7 +228,7 @@
           "name": "University",
           "mode": "per_fte_per_year",
           "amount_per_year": 170000,
-          "notes": "170 000 SEK per FTE and year"
+          "notes": "170tkr per FTE and year"
         }
       ]
     },
@@ -245,7 +245,7 @@
           "name": "University",
           "mode": "per_fte_per_year",
           "amount_per_year": 170000,
-          "notes": "170 000 SEK per FTE and year"
+          "notes": "170tkr per FTE and year"
         }
       ]
     },
@@ -262,13 +262,13 @@
           "name": "Vice Chancellor",
           "mode": "fixed_per_year",
           "amount_per_year": 750000,
-          "notes": "VC 750k/yr"
+          "notes": "750tkr/yr"
         },
         {
           "name": "Faculty (NT)",
           "mode": "fixed_per_year",
           "amount_per_year": 250000,
-          "notes": "Faculty 250k/yr"
+          "notes": "250tkr/yr"
         }
       ]
     },
@@ -285,13 +285,13 @@
           "name": "Vice Chancellor",
           "mode": "percent_total",
           "value": 25,
-          "notes": "VC 25% of total"
+          "notes": "25% of total"
         },
         {
           "name": "Faculty (NT)",
           "mode": "percent_total",
           "value": 5,
-          "notes": "Faculty 5% of total"
+          "notes": "5% of total"
         }
       ]
     },
@@ -308,13 +308,13 @@
           "name": "Vice Chancellor",
           "mode": "fixed_per_year",
           "amount_per_year": 750000,
-          "notes": "VC 750k/yr"
+          "notes": "750tkr/yr"
         },
         {
           "name": "Faculty (NT)",
           "mode": "fixed_per_year",
           "amount_per_year": 250000,
-          "notes": "Faculty 250k/yr"
+          "notes": "250tkr/yr"
         }
       ]
     },
@@ -331,13 +331,13 @@
           "name": "Vice Chancellor",
           "mode": "fixed_per_year",
           "amount_per_year": 750000,
-          "notes": "VC 750k/yr"
+          "notes": "750tkr/yr"
         },
         {
           "name": "Faculty (NT)",
           "mode": "fixed_per_year",
           "amount_per_year": 250000,
-          "notes": "Faculty 250k/yr"
+          "notes": "250tkr/yr"
         }
       ]
     },
@@ -351,10 +351,10 @@
       },
       "uf_rules": [
         {
-          "name": "Faculty (NT)",
+          "name": "Faculty",
           "mode": "percent_total",
           "value": 5,
-          "notes": "Faculty 5% of total"
+          "notes": "5% of total"
         }
       ]
     },
@@ -371,7 +371,7 @@
           "name": "Vice Chancellor",
           "mode": "fixed_per_year",
           "amount_per_year": 750000,
-          "notes": "VC 750k/yr"
+          "notes": "750tkr/yr"
         }
       ]
     },
@@ -382,20 +382,20 @@
       "funder": {
         "mode": "percent_overhead",
         "value": 25,
-        "label": "EU covers 25% overhead on direct costs"
+        "label": "Up to 25% for indirect costs"
       },
       "uf_rules": [
         {
-          "name": "Rektor",
+          "name": "University",
           "mode": "oh_gap_share",
           "value": 50,
-          "notes": "Rektor covers 50% of OH gap above 25%"
+          "notes": "50% of OH gap above 25%"
         },
         {
-          "name": "Faculty (NT)",
+          "name": "Faculty",
           "mode": "oh_gap_share",
           "value": 50,
-          "notes": "Faculty (NT) covers 50% of OH gap above 25%"
+          "notes": "50% of OH gap above 25%"
         }
       ]
     },
@@ -409,16 +409,16 @@
       },
       "uf_rules": [
         {
-          "name": "Vice Chancellor",
+          "name": "University",
           "mode": "percent_total",
           "value": 25,
-          "notes": "VC 25% of total"
+          "notes": "25% of total"
         },
         {
-          "name": "Faculty (NT)",
+          "name": "Faculty",
           "mode": "percent_total",
           "value": 5,
-          "notes": "Faculty 5% of total"
+          "notes": "5% of total"
         }
       ]
     },
@@ -432,10 +432,10 @@
       },
       "uf_rules": [
         {
-          "name": "Vice Chancellor",
+          "name": "University",
           "mode": "fixed_per_year",
           "amount_per_year": 750000,
-          "notes": "VC 750k/yr"
+          "notes": "750tkr/yr"
         }
       ]
     },
