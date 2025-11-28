@@ -98,12 +98,6 @@
           "mode": "percent_total",
           "value": 25,
           "notes": "25% of total"
-        },
-        {
-          "name": "Faculty (NT)",
-          "mode": "percent_total",
-          "value": 5,
-          "notes": "5% of total"
         }
       ]
     },
