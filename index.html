@@ -101,7 +101,6 @@
       <div id="staffFTERow" class="hidden">
         <label for="staffFTE">Number of positions funded (FTE)</label>
         <input id="staffFTE" data-decimal="true" placeholder="e.g., 1.5"/>
-        <div class="help">Used for RJ schemes where the foundation contributes 170 000 SEK per FTE and year on top of the grant.</div>
       </div>
       <div>
         <label>Available for direct costs (live)</label>
@@ -152,7 +151,7 @@
         <label for="servicePurchases">Service purchases (consultants, subcontracting, evaluation)</label>
         <input id="servicePurchases" data-decimal="false" inputmode="numeric" placeholder="e.g., 500 000"/>
         <div class="help">
-          The department must co-finance 100% of the overhead on these costs.
+          The department must co-finance all overhead on these costs
         </div>
       </div>
       <div>
@@ -518,7 +517,7 @@
       parts.push('<strong>Special rule:</strong> All indirect costs on service purchases must be covered by the department');
     }
     if(sc.id === 'rj_programme' || sc.id === 'rj_project'){
-      parts.push('<strong>Special rule:</strong> 170 000 SEK per FTE and year is added on top of the RJ grant amount and does not reduce the requested amount from RJ');
+      parts.push('<strong>Special rule:</strong> 170tkr per FTE and year is added on top of the RJ grant amount');
     }
 
     return parts.join('<br>');
