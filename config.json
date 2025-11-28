@@ -268,6 +268,29 @@
       ]
     },
     {
+      "id": "erc_adv",
+      "name": "ERC – Advanced Grant",
+      "funder": {
+        "mode": "percent_total",
+        "value": 25,
+        "label": "Up to 25% for indirect costs"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "fixed_per_year",
+          "amount_per_year": 750000,
+          "notes": "VC 750k/yr"
+        },
+        {
+          "name": "Faculty (NT)",
+          "mode": "fixed_per_year",
+          "amount_per_year": 250000,
+          "notes": "Faculty 250k/yr"
+        }
+      ]
+    },
+    {
       "id": "erc_syg",
       "name": "ERC – Synergy Grant",
       "funder": {
