@@ -339,7 +339,7 @@
       return Math.max(0, Math.round(capped));
     }
 
-    // per_fte_per_year is handled as project top-up, not UF OH coverage
+    // per_fte_per_year is handled as project top-up, not OH coverage
     if(mode === 'per_fte_per_year'){
       return 0;
     }
@@ -468,54 +468,54 @@
 
     const parts = [];
 
-    // Funder explanation
+    // 1) Funder explanation (config-driven)
     if(sc.funder && sc.funder.label){
       parts.push(`<strong>Funder:</strong> ${sc.funder.label}.`);
     }
 
-    // University / Faculty contributions
+    // 2) University / Faculty / other internal contributions from uf_rules
     if (Array.isArray(sc.uf_rules) && sc.uf_rules.length) {
       const uniLines = [];
       const facLines = [];
+      const otherLines = [];
 
       sc.uf_rules.forEach(r => {
-        if (r.mode === "per_fte_per_year") return;
+        if (r.mode === 'per_fte_per_year') return; // RJ top-up handled separately
 
-        const note = r.notes || "";
+        const name = (r.name || '').toLowerCase();
+        const note = r.notes || '';
 
-        // University (formerly Rektor)
-        if (r.name && r.name.toLowerCase().includes("rektor")) {
-          uniLines.push(
-            note
-              .replace(/^VC\s*/i, "")
-              .replace(/^Rektor\s*/i, "")
-          );
-        } 
-        // Faculty (formerly Faculty NT)
-        else if (r.name && r.name.toLowerCase().includes("faculty")) {
-          facLines.push(
-            note
-              .replace(/^Faculty\s*/i, "")
-              .replace(/\(nt\)/i, "")
-              .trim()
-          );
+        // University-level: allow "Rektor", "University", "VC", "Vice Chancellor", etc.
+        if (/rektor|university|vice|vc/.test(name)) {
+          uniLines.push(note || 'Contributes to covering part of the overhead costs.');
+        }
+        // Faculty-level
+        else if (/faculty/.test(name)) {
+          facLines.push(note || 'Contributes to covering part of the overhead costs.');
+        }
+        // Other internal mechanisms if you ever use them
+        else if (note) {
+          otherLines.push(`${r.name ? r.name + ': ' : ''}${note}`);
         }
       });
 
       if (uniLines.length) {
-        parts.push(`<strong>University co-funding:</strong> ${uniLines.join(" ")}`);
+        parts.push(`<strong>University co-funding:</strong> ${uniLines.join(' ')}`);
       }
       if (facLines.length) {
-        parts.push(`<strong>Faculty co-funding:</strong> ${facLines.join(" ")}`);
+        parts.push(`<strong>Faculty co-funding:</strong> ${facLines.join(' ')}`);
+      }
+      if (otherLines.length) {
+        parts.push(`<strong>Other internal co-funding:</strong> ${otherLines.join(' ')}`);
       }
     }
 
-    // Scheme-specific clarifications
+    // 3) Structural scheme-specific clarifications (not duplicating config text)
     if(sc.id === 'horizon'){
       parts.push('<strong>Special rule:</strong> All indirect costs on service purchases must be covered by the department.');
     }
     if(sc.id === 'rj_programme' || sc.id === 'rj_project'){
-      parts.push('<strong>Special rule:</strong> 170 000 SEK per FTE and year is added on top of the RJ grant amount and does not reduce the requested amount from RJ.');
+      parts.push('<strong>Special rule:</strong> The 170 000 SEK per FTE and year is added on top of the RJ grant amount and does not reduce the requested amount from RJ.');
     }
 
     return parts.join('<br>');
@@ -561,13 +561,23 @@
     const row=(l,v)=> (v>0 || v===0) ? `<div class="k">${l}</div><div class="v mono">${fmt(v)}</div>` : '';
     const text=(l,v)=>`<div class="k">${l}</div><div class="v">${v}</div>`;
 
-    const rectorRaw   = d.ufByName && d.ufByName['Rektor'] ? d.ufByName['Rektor'] : 0;
-    const facultyRaw  = d.ufByName && d.ufByName['Faculty (NT)'] ? d.ufByName['Faculty (NT)'] : 0;
-    const otherUF = d.ufByName
-      ? Object.entries(d.ufByName)
-          .filter(([name])=>name!=='Rektor' && name!=='Faculty (NT)')
-          .reduce((acc,[,val])=>acc+val,0)
-      : 0;
+    // Group UF contributions dynamically by name pattern
+    let uniAmount = 0;
+    let facAmount = 0;
+    let otherUF   = 0;
+
+    if (d.ufByName) {
+      for (const [name, val] of Object.entries(d.ufByName)) {
+        const n = (name || '').toLowerCase();
+        if (/rektor|university|vice|vc/.test(n)) {
+          uniAmount += val;
+        } else if (/faculty/.test(n)) {
+          facAmount += val;
+        } else {
+          otherUF += val;
+        }
+      }
+    }
 
     const isRJ = (d.schemeId === 'rj_programme' || d.schemeId === 'rj_project');
 
@@ -588,8 +598,8 @@
           ${row('Department overhead (cascading)', d.deptOver)}
           ${row('Funder indirect coverage', d.funderCoverage)}
           ${d.ufApplied>0 ? row('Univ/Faculty contribution (total)', d.ufApplied) : ''}
-          ${rectorRaw ? row('…of which University', rectorRaw) : ''}
-          ${facultyRaw ? row('…of which Faculty', facultyRaw) : ''}
+          ${uniAmount ? row('…of which University', uniAmount) : ''}
+          ${facAmount ? row('…of which Faculty', facAmount) : ''}
           ${otherUF ? row('…other UF contributions', otherUF) : ''}
         </div>
       </div>
