@@ -251,7 +251,10 @@
     }
     intPart=intPart.replace(/[^\d]/g,'');
     const formattedInt=intPart.replace(/\B(?=(\d{3})+(?!\d))/g,' ');
-    el.value = formattedInt + ((allowDecimal && decSep && fracPart.length>0) ? (decSep + fracPart) : '');
+
+    // *** FIX: always keep the decimal separator if decimals are allowed and one was typed,
+    // even if there are not yet any decimal digits after it.
+    el.value = formattedInt + ((allowDecimal && decSep) ? (decSep + fracPart) : '');
   }
 
   function attachFormatters(){
@@ -510,7 +513,7 @@
       }
     }
 
-    // 3) Structural scheme-specific clarifications (not duplicating config text)
+    // 3) Structural scheme-specific clarifications
     if(sc.id === 'horizon'){
       parts.push('<strong>Special rule:</strong> All indirect costs on service purchases must be covered by the department.');
     }
