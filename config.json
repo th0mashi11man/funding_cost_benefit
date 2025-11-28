@@ -1,7 +1,7 @@
 {
   "title": "Applied IT Research Funding Financial Cost-Benefit Calculator",
   "overhead": {
-    "label": "2026",
+    "label": "AIT 2026",
     "salary_percent": 54,
     "other_percent": 45
   },
@@ -9,13 +9,36 @@
   "schemes": [
     {
       "id": "vr",
-      "name": "VR – Swedish Research Council",
+      "name": "VR",
       "funder": {
         "mode": "percent_overhead",
         "value": 100,
         "label": "Covers all overhead costs"
       },
       "uf_rules": []
+    },
+    {
+      "id": "vr_infra",
+      "name": "VR – Infrastructure (RFI)",
+      "funder": {
+        "mode": "percent_overhead",
+        "value": 100,
+        "label": "Covers all overhead costs"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "percent_total",
+          "value": 25,
+          "notes": "VC 25% of total"
+        },
+        {
+          "name": "Faculty (NT)",
+          "mode": "percent_total",
+          "value": 25,
+          "notes": "Faculty 25% of total"
+        }
+      ]
     },
     {
       "id": "forte",
@@ -76,6 +99,13 @@
           "mode": "percent_total",
           "value": 25,
           "notes": "VC 25% of total"
+        },
+        {
+          "name": "Faculty (NT)",
+          "mode": "percent_total_capped_per_year",
+          "value": 5,
+          "per_year_cap": 1000000,
+          "notes": "Faculty 5% (max 1M/yr)"
         }
       ]
     },
@@ -103,7 +133,29 @@
         }
       ]
     },
-
+    {
+      "id": "kaw_infra",
+      "name": "KAW – Infrastructure",
+      "funder": {
+        "mode": "none",
+        "value": 0,
+        "label": "No coverage"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "percent_total",
+          "value": 25,
+          "notes": "VC 25% of total"
+        },
+        {
+          "name": "Faculty (NT)",
+          "mode": "percent_total",
+          "value": 5,
+          "notes": "Faculty 5% of total"
+        }
+      ]
+    },
     {
       "id": "mmw_project",
       "name": "MMW – Projects",
@@ -220,7 +272,29 @@
         }
       ]
     },
-
+    {
+      "id": "rj_infra",
+      "name": "RJ – Infrastructure",
+      "funder": {
+        "mode": "none",
+        "value": 0,
+        "label": "No coverage"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "percent_total",
+          "value": 25,
+          "notes": "VC 25% of total"
+        },
+        {
+          "name": "Faculty (NT)",
+          "mode": "percent_total",
+          "value": 5,
+          "notes": "Faculty 5% of total"
+        }
+      ]
+    },
     {
       "id": "erc_stg",
       "name": "ERC – Starting Grant",
@@ -277,16 +351,10 @@
       },
       "uf_rules": [
         {
-          "name": "Vice Chancellor",
-          "mode": "fixed_per_year",
-          "amount_per_year": 750000,
-          "notes": "VC 750k/yr"
-        },
-        {
           "name": "Faculty (NT)",
-          "mode": "fixed_per_year",
-          "amount_per_year": 250000,
-          "notes": "Faculty 250k/yr"
+          "mode": "percent_total",
+          "value": 5,
+          "notes": "Faculty 5% of total"
         }
       ]
     },
@@ -331,7 +399,29 @@
         }
       ]
     },
-
+    {
+      "id": "scilifelab",
+      "name": "SciLifeLab – Infrastructure",
+      "funder": {
+        "mode": "none",
+        "value": 0,
+        "label": "No coverage"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "percent_total",
+          "value": 25,
+          "notes": "VC 25% of total"
+        },
+        {
+          "name": "Faculty (NT)",
+          "mode": "percent_total",
+          "value": 5,
+          "notes": "Faculty 5% of total"
+        }
+      ]
+    },
     {
       "id": "ssf_frl",
       "name": "SSF – Future Research Leaders",
