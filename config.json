@@ -13,7 +13,7 @@
       "funder": {
         "mode": "percent_overhead",
         "value": 100,
-        "label": "All overhead costs"
+        "label": "All indirect costs covered in budget"
       },
       "uf_rules": []
     },
@@ -23,7 +23,7 @@
       "funder": {
         "mode": "percent_overhead",
         "value": 100,
-        "label": "All overhead costs"
+        "label": "All indirect costs covered in budget"
       },
       "uf_rules": [
         {
@@ -46,7 +46,7 @@
       "funder": {
         "mode": "percent_overhead",
         "value": 100,
-        "label": "All overhead costs"
+        "label": "All indirect costs covered in budget"
       },
       "uf_rules": []
     },
@@ -56,7 +56,7 @@
       "funder": {
         "mode": "percent_overhead",
         "value": 100,
-        "label": "All overhead costs"
+        "label": "All indirect costs covered in budget"
       },
       "uf_rules": []
     },
@@ -139,7 +139,7 @@
       "funder": {
         "mode": "none",
         "value": 0,
-        "label": "No coverage"
+        "label": "No coverage of indirect costs"
       },
       "uf_rules": [
         {
@@ -221,14 +221,14 @@
       "funder": {
         "mode": "none",
         "value": 0,
-        "label": "No coverage"
+        "label": "Coverage based number of full time equivalent (FTE) positions included"
       },
       "uf_rules": [
         {
           "name": "University",
           "mode": "per_fte_per_year",
           "amount_per_year": 170000,
-          "notes": "170tkr per FTE and year"
+          "notes": "170tkr per FTE and year added to total budget"
         }
       ]
     },
@@ -238,14 +238,14 @@
       "funder": {
         "mode": "none",
         "value": 0,
-        "label": "No coverage"
+        "label": "Coverage based number of full time equivalent (FTE) positions included"
       },
       "uf_rules": [
         {
           "name": "University",
           "mode": "per_fte_per_year",
           "amount_per_year": 170000,
-          "notes": "170tkr per FTE and year"
+          "notes": "170tkr per FTE and year added to total budget"
         }
       ]
     },
@@ -255,7 +255,7 @@
       "funder": {
         "mode": "none",
         "value": 0,
-        "label": "No coverage"
+        "label": "No coverage of indirect costs"
       },
       "uf_rules": [
         {
@@ -278,7 +278,7 @@
       "funder": {
         "mode": "none",
         "value": 0,
-        "label": "No coverage"
+        "label": "No coverage of indirect costs"
       },
       "uf_rules": [
         {
@@ -405,7 +405,7 @@
       "funder": {
         "mode": "none",
         "value": 0,
-        "label": "No coverage"
+        "label": "No coverage of indirect costs"
       },
       "uf_rules": [
         {
@@ -428,7 +428,7 @@
       "funder": {
         "mode": "none",
         "value": 0,
-        "label": "No coverage"
+        "label": "No coverage of indirect costs"
       },
       "uf_rules": [
         {
