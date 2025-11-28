@@ -78,10 +78,9 @@
         },
         {
           "name": "Faculty (NT)",
-          "mode": "percent_total_capped_per_year",
+          "mode": "percent_total",
           "value": 5,
-          "per_year_cap": 1000000,
-          "notes": "5% of total (max 1M/yr)"
+          "notes": "5% of total"
         }
       ]
     },
@@ -102,10 +101,9 @@
         },
         {
           "name": "Faculty (NT)",
-          "mode": "percent_total_capped_per_year",
+          "mode": "percent_total",
           "value": 5,
-          "per_year_cap": 1000000,
-          "notes": "5% of total (max 1M/yr)"
+          "notes": "5% of total"
         }
       ]
     },
@@ -126,10 +124,9 @@
         },
         {
           "name": "Faculty (NT)",
-          "mode": "percent_total_capped_per_year",
+          "mode": "percent_total",
           "value": 5,
-          "per_year_cap": 1000000,
-          "notes": "5% of total (max 1M/yr)"
+          "notes": "5% of total"
         }
       ]
     },
@@ -210,7 +207,7 @@
           "name": "Faculty (NT)",
           "mode": "fixed_per_year",
           "amount_per_year": 250000,
-          "notes": "F250tkr/yr"
+          "notes": "250tkr/yr"
         }
       ]
     },
