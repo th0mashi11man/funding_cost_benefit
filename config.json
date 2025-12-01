@@ -212,7 +212,7 @@
       "funder": {
         "mode": "none",
         "value": 0,
-        "label": "Coverage based number of full time equivalent (FTE) positions included"
+        "label": "Coverage of indirect costs is based on the number of full time equivalent (FTE) positions included in the application"
       },
       "uf_rules": [
         {
@@ -229,7 +229,7 @@
       "funder": {
         "mode": "none",
         "value": 0,
-        "label": "Coverage based number of full time equivalent (FTE) positions included"
+        "label": "Coverage of indirect costs is based on the number of full time equivalent (FTE) positions included in the application"
       },
       "uf_rules": [
         {
