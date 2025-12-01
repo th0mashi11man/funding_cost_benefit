@@ -380,13 +380,13 @@
           "name": "University",
           "mode": "oh_gap_share",
           "value": 50,
-          "notes": "50% of OH gap above 25%"
+          "notes": "50% of remaining indirect costs above the 25% covered by the funder"
         },
         {
           "name": "Faculty",
           "mode": "oh_gap_share",
           "value": 50,
-          "notes": "50% of OH gap above 25%"
+          "notes": "50% of remaining indirect costs above the 25% covered by the funder"
         }
       ]
     },
