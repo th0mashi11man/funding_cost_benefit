@@ -212,7 +212,7 @@
       "funder": {
         "mode": "none",
         "value": 0,
-        "label": "Coverage of indirect costs is based on the number of full time equivalent (FTE) positions included in the application"
+        "label": "Coverage of indirect costs is based on the number of full-time equivalent (FTE) positions included in the application"
       },
       "uf_rules": [
         {
@@ -229,7 +229,7 @@
       "funder": {
         "mode": "none",
         "value": 0,
-        "label": "Coverage of indirect costs is based on the number of full time equivalent (FTE) positions included in the application"
+        "label": "Coverage of indirect costs is based on the number of full-time equivalent (FTE) positions included in the application"
       },
       "uf_rules": [
         {
@@ -414,12 +414,29 @@
       ]
     },
     {
+      "id": "ssf",
+      "name": "SSF",
+      "funder": {
+        "mode": "percent_overhead",
+        "value": 25,
+        "label": "Covers an overhead level up to 25% on direct costs"
+      },
+      "uf_rules": [
+        {
+          "name": "University",
+          "mode": "fixed_per_year",
+          "amount_per_year": 750000,
+          "notes": "750tkr/yr"
+        }
+      ]
+    },
+    {
       "id": "ssf_frl",
       "name": "SSF – Future Research Leaders",
       "funder": {
-        "mode": "none",
-        "value": 0,
-        "label": "No coverage of indirect costs"
+        "mode": "percent_overhead",
+        "value": 25,
+        "label": "Covers an overhead level up to 25% on direct costs"
       },
       "uf_rules": [
         {
