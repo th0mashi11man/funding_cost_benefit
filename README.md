@@ -1,160 +1,94 @@
-# This simple javascript tool performs a basic cost-benefit analysis on external research funding
+# Applied IT Research Funding Financial Cost-Benefit Calculator
 
-The config.json file defines the overhead policy, list of funders, and how
-University and Faculty co-funding is applied in the calculator.
+This application performs a detailed cost-benefit analysis on external research funding for the Department of Applied IT. It helps researchers and financial officers understand the relationship between funder coverage, departmental co-financing, and the recovery of existing salary costs.
 
-The calculator automatically reads this file when it loads from
-the same directory as index.html
+The tool is built with **React**, **TypeScript**, and **Vite**, and is deployed automatically to GitHub Pages.
 
+## 🚀 Getting Started
 
-1) OVERHEAD POLICY
+To run the application locally:
 
-The 'overhead' section defines the department's default indirect
-cost (overhead) rates, for information and internal calculations.
+1.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+2.  **Start the development server:**
+    ```bash
+    npm run dev
+    ```
+3.  **Build for production:**
+    ```bash
+    npm run build
+    ```
 
-Example:
-  \"overhead\": {
-    \"label\": \"2025\",
-    \"salary_percent\": 62,
-    \"other_percent\": 52
-  }
+## 📦 Deployment
 
-• label – short text shown in the UI badge
-• salary_percent – overhead % on salary costs
-• other_percent – overhead % on other costs
+The application is hosted on GitHub Pages. To deploy the latest changes:
 
+```bash
+npm run deploy
+```
 
-2) DEFAULT FUNDING SCHEME
+This runs the `predeploy` script (building the project) and then uses `gh-pages` to push the `dist` folder to the `gh-pages` branch.
 
-  \"defaultScheme\": \"vr\"
+---
 
-Determines which scheme is selected by default when the page loads.
-The value must match one of the 'id' entries under 'schemes'.
+## ⚙️ Configuration (config.json)
 
+The `public/config.json` file defines the overhead policy, list of funders, and the rules for University and Faculty co-funding. The application fetches this file dynamically at runtime.
 
-3) ADDING OR EDITING FUNDERS / GRANT SCHEMES
+### 1) Overhead Policy
 
-Each grant scheme is listed as an object in the 'schemes' array:
+Defines the departmental indirect cost rates:
 
-  {
-    \"id\": \"unique_id\",
-    \"name\": \"Grant Scheme Name\",
-    \"funder\": { ... },
-    \"uf_rules\": [ ... ]
-  }
+```json
+"overhead": {
+  "label": "2025",
+  "salary_percent": 62,
+  "other_percent": 52
+}
+```
 
+- **label**: Short text shown in the UI badge.
+- **salary_percent**: Overhead % applied to salary costs.
+- **other_percent**: Overhead % applied to other direct costs.
 
-3A) FUNDER OBJECT
+### 2) Default Funding Scheme
 
-The 'funder' object defines how the funding body covers indirect costs.
+```json
+"defaultScheme": "vr"
+```
 
-Choose ONE of the following modes:
+Determines which scheme (by `id`) is selected when the page first loads.
 
-1. \"percent_overhead\"  – covers a % of the department overhead.
-   Example: { \"mode\": \"percent_overhead\", \"value\": 100,
-              \"label\": \"Covers all overhead costs\" }
+### 3) Funding Schemes & Funder Rules
 
-2. \"percent_total\" – covers indirects as a % of total project budget
-   (using a cascading formula).
-   Example: { \"mode\": \"percent_total\", \"value\": 25,
-              \"label\": \"Up to 25% for indirect costs\" }
+Each entry in the `schemes` array defines a funder's behavior:
 
-3. \"absolute\" – covers a fixed SEK amount of overhead.
-   Example: { \"mode\": \"absolute\", \"value\": 150000,
-              \"label\": \"Fixed 150 000 SEK overhead\" }
+#### Funder Object Modes:
 
-4. \"none\" – no specific coverage of indirect costs.
-   Example: { \"mode\": \"none\", \"value\": 0, \"label\": \"No coverage\" }
+1.  `"percent_overhead"`: Covers a specific % of the calculated department overhead.
+2.  `"percent_total"`: Covers indirects as a percentage of the total project budget (cascading).
+3.  `"absolute"`: Covers a fixed SEK amount of overhead.
+4.  `"none"`: No coverage of indirect costs.
+5.  `"manual"`: (Used for 'Other') allows user input in the UI.
 
-5. \"manual\" – reserved for the 'Other' scheme (user enters values manually).
-   Example: { \"mode\": \"manual\", \"value\": null, \"label\": \"Manual entry\" }
+### 4) Internal Support Rules (University / Faculty)
 
-3B) UNIVERSITY / FACULTY (UF) CONTRIBUTION RULES
+The `uf_rules` array defines how internal bodies co-finance the project:
 
-Each funder may include one or more university/faculty co-funding rules
-under 'uf_rules'.  If there is none, set it to an empty array: [].
+- **modes**: `percent_total`, `percent_total_capped_per_year`, `fixed_per_year`.
+- **notes**: Text displayed in the UI information box.
 
-Each rule must contain:
-• name – who contributes (e.g., “Vice Chancellor”, “Faculty”)
-• mode – how the contribution is calculated
-• notes – short description shown to the user
+---
 
-Available modes:
+## 🛠 Project Structure
 
-1. \"percent_total\"  → percentage of total project amount.
-   { \"name\": \"Vice Chancellor\", \"mode\": \"percent_total\",
-     \"value\": 25, \"notes\": \"VC 25% of total\" }
+- `src/App.tsx`: Main UI logic and component structure.
+- `src/logic/math.ts`: Core financial calculation engine.
+- `src/logic/i18n.ts`: Translation dictionary for Swedish and English support.
+- `public/config.json`: Externalized configuration for funders and rates.
 
-2. \"percent_total_capped_per_year\"  → % of total, capped per year.
-   { \"name\": \"Faculty\", \"mode\": \"percent_total_capped_per_year\",
-     \"value\": 5, \"per_year_cap\": 1000000,
-     \"notes\": \"Faculty 5% (max 1M/yr)\" }
+## 📝 Legal Disclaimer
 
-3. \"fixed_per_year\"  → fixed SEK amount per project year.
-   { \"name\": \"Vice Chancellor\", \"mode\": \"fixed_per_year\",
-     \"amount_per_year\": 750000, \"notes\": \"VC 750k/yr\" }
-
-
-3C) ORDER AND THE 'OTHER' SCHEME
-
-• Normal schemes appear in the order listed.
-• The special 'Other' scheme is automatically shown last and allows users
-  to type custom coverage values in the UI.
-  Example:
-    {
-      \"id\": \"other\",
-      \"name\": \"Other\",
-      \"funder\": { \"mode\": \"manual\", \"value\": null,
-                   \"label\": \"Manual entry\" },
-      \"uf_rules\": []
-    }
-
-
-4) VALIDATION AND BEST PRACTICES
-
-• Every 'id' must be unique.
-• 'defaultScheme' must match one of those ids.
-• Numeric fields must not contain percent signs or commas.
-• If a scheme has no university/faculty contributions, use \"uf_rules\": [].
-• 'label' and 'notes' fields are for display text only.
-
-
-5) QUICK EXAMPLES
-
-A) Funder covers all overhead, no university/faculty contribution:
-  {
-    \"id\": \"vr\",
-    \"name\": \"VR – Swedish Research Council\",
-    \"funder\": { \"mode\": \"percent_overhead\", \"value\": 100,
-                  \"label\": \"Covers all overhead costs\" },
-    \"uf_rules\": []
-  }
-
-B) Funder covers 20% overhead + VC and Faculty contributions:
-  {
-    \"id\": \"kaw_project\",
-    \"name\": \"KAW – Projects\",
-    \"funder\": { \"mode\": \"percent_overhead\", \"value\": 20,
-                  \"label\": \"Up to 20% for indirect costs\" },
-    \"uf_rules\": [
-      { \"name\": \"Vice Chancellor\", \"mode\": \"percent_total\",
-        \"value\": 25, \"notes\": \"VC 25% of total\" },
-      { \"name\": \"Faculty\", \"mode\": \"percent_total_capped_per_year\",
-        \"value\": 5, \"per_year_cap\": 1000000,
-        \"notes\": \"Faculty 5% (max 1M/yr)\" }
-    ]
-  }
-
-C) ERC-style 25% cascading coverage + fixed per-year contributions:
-  {
-    \"id\": \"erc_stg\",
-    \"name\": \"ERC – Starting Grant\",
-    \"funder\": { \"mode\": \"percent_total\", \"value\": 25,
-                 \"label\": \"Up to 25% for indirect costs\" },
-    \"uf_rules\": [
-      { \"name\": \"Vice Chancellor\", \"mode\": \"fixed_per_year\",
-        \"amount_per_year\": 750000, \"notes\": \"VC 750k/yr\" },
-      { \"name\": \"Faculty\", \"mode\": \"fixed_per_year\",
-        \"amount_per_year\": 250000, \"notes\": \"Faculty 250k/yr\" }
-    ]
-  }
+*NB: This tool is for illustrative purposes only. Always verify results with a financial officer before submitting formal applications.*
