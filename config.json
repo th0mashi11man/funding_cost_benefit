@@ -1,0 +1,461 @@
+{
+  "title": "Applied IT Research Funding Financial Cost-Benefit Calculator",
+  "overhead": {
+    "label": "AIT 2026",
+    "salary_percent": 54,
+    "other_percent": 45
+  },
+  "defaultScheme": "vr",
+  "schemes": [
+    {
+      "id": "vr",
+      "name": "VR",
+      "funder": {
+        "mode": "percent_overhead",
+        "value": 100,
+        "label": "All indirect costs covered in budget"
+      },
+      "uf_rules": []
+    },
+    {
+      "id": "vr_infra",
+      "name": "VR – Infrastructure (RFI)",
+      "funder": {
+        "mode": "percent_overhead",
+        "value": 100,
+        "label": "All indirect costs covered in budget"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "percent_total",
+          "value": 25,
+          "notes": "25% of total"
+        },
+        {
+          "name": "Faculty (NT)",
+          "mode": "percent_total",
+          "value": 25,
+          "notes": "25% of total"
+        }
+      ]
+    },
+    {
+      "id": "forte",
+      "name": "Forte",
+      "funder": {
+        "mode": "percent_overhead",
+        "value": 100,
+        "label": "All indirect costs covered in budget"
+      },
+      "uf_rules": []
+    },
+    {
+      "id": "formas",
+      "name": "Formas",
+      "funder": {
+        "mode": "percent_overhead",
+        "value": 100,
+        "label": "All indirect costs covered in budget"
+      },
+      "uf_rules": []
+    },
+
+    {
+      "id": "kaw_potential",
+      "name": "KAW – Research project of high scientific value",
+      "funder": {
+        "mode": "percent_overhead",
+        "value": 20,
+        "label": "Up to 20% for indirect costs"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "percent_total",
+          "value": 25,
+          "notes": "25% of total"
+        },
+        {
+          "name": "Faculty (NT)",
+          "mode": "percent_total",
+          "value": 5,
+          "notes": "5% of total"
+        }
+      ]
+    },
+    {
+      "id": "kaw_project",
+      "name": "KAW – Projects",
+      "funder": {
+        "mode": "percent_overhead",
+        "value": 20,
+        "label": "Up to 20% for indirect costs"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "percent_total",
+          "value": 25,
+          "notes": "25% of total"
+        }
+      ]
+    },
+    {
+      "id": "kaw_scholar",
+      "name": "KAW – Scholars",
+      "funder": {
+        "mode": "percent_overhead",
+        "value": 20,
+        "label": "Up to 20% for indirect costs"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "percent_total",
+          "value": 25,
+          "notes": "25% of total"
+        },
+        {
+          "name": "Faculty (NT)",
+          "mode": "percent_total",
+          "value": 5,
+          "notes": "5% of total"
+        }
+      ]
+    },
+    {
+      "id": "kaw_infra",
+      "name": "KAW – Infrastructure",
+      "funder": {
+        "mode": "none",
+        "value": 0,
+        "label": "No coverage of indirect costs"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "percent_total",
+          "value": 25,
+          "notes": "25% of total"
+        },
+        {
+          "name": "Faculty (NT)",
+          "mode": "percent_total",
+          "value": 5,
+          "notes": "5% of total"
+        }
+      ]
+    },
+    {
+      "id": "mmw_project",
+      "name": "MMW – Projects",
+      "funder": {
+        "mode": "percent_overhead",
+        "value": 20,
+        "label": "Up to 20% for indirect costs"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "percent_total",
+          "value": 25,
+          "notes": "25% of total"
+        }
+      ]
+    },
+    {
+      "id": "maw_project",
+      "name": "MAW – Projects",
+      "funder": {
+        "mode": "percent_overhead",
+        "value": 20,
+        "label": "Up to 20% for indirect costs"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "percent_total",
+          "value": 25,
+          "notes": "25% of total"
+        }
+      ]
+    },
+
+    {
+      "id": "waf",
+      "name": "Wallenberg Academy Fellow",
+      "funder": {
+        "mode": "percent_overhead",
+        "value": 20,
+        "label": "Up to 20% for indirect costs"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "fixed_per_year",
+          "amount_per_year": 750000,
+          "notes": "750tkr/yr"
+        },
+        {
+          "name": "Faculty (NT)",
+          "mode": "fixed_per_year",
+          "amount_per_year": 250000,
+          "notes": "250tkr/yr"
+        }
+      ]
+    },
+
+    {
+      "id": "rj_programme",
+      "name": "RJ – Programme",
+      "funder": {
+        "mode": "none",
+        "value": 0,
+        "label": "Coverage of indirect costs is based on the number of full-time equivalent (FTE) positions included in the application"
+      },
+      "uf_rules": [
+        {
+          "name": "University",
+          "mode": "per_fte_per_year",
+          "amount_per_year": 170000,
+          "notes": "170tkr per FTE and year added to total budget"
+        }
+      ]
+    },
+    {
+      "id": "rj_project",
+      "name": "RJ – Project",
+      "funder": {
+        "mode": "none",
+        "value": 0,
+        "label": "Coverage of indirect costs is based on the number of full-time equivalent (FTE) positions included in the application"
+      },
+      "uf_rules": [
+        {
+          "name": "University",
+          "mode": "per_fte_per_year",
+          "amount_per_year": 170000,
+          "notes": "170tkr per FTE and year added to total budget"
+        }
+      ]
+    },
+    {
+      "id": "rj_profutura",
+      "name": "RJ – Pro Futura",
+      "funder": {
+        "mode": "none",
+        "value": 0,
+        "label": "No coverage of indirect costs"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "fixed_per_year",
+          "amount_per_year": 750000,
+          "notes": "750tkr/yr"
+        },
+        {
+          "name": "Faculty (NT)",
+          "mode": "fixed_per_year",
+          "amount_per_year": 250000,
+          "notes": "250tkr/yr"
+        }
+      ]
+    },
+    {
+      "id": "rj_infra",
+      "name": "RJ – Infrastructure",
+      "funder": {
+        "mode": "none",
+        "value": 0,
+        "label": "No coverage of indirect costs"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "percent_total",
+          "value": 25,
+          "notes": "25% of total"
+        },
+        {
+          "name": "Faculty (NT)",
+          "mode": "percent_total",
+          "value": 5,
+          "notes": "5% of total"
+        }
+      ]
+    },
+    {
+      "id": "erc_stg",
+      "name": "ERC – Starting Grant",
+      "funder": {
+        "mode": "percent_total",
+        "value": 25,
+        "label": "Up to 25% for indirect costs"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "fixed_per_year",
+          "amount_per_year": 750000,
+          "notes": "750tkr/yr"
+        },
+        {
+          "name": "Faculty (NT)",
+          "mode": "fixed_per_year",
+          "amount_per_year": 250000,
+          "notes": "250tkr/yr"
+        }
+      ]
+    },
+    {
+      "id": "erc_cog",
+      "name": "ERC – Consolidator Grant",
+      "funder": {
+        "mode": "percent_total",
+        "value": 25,
+        "label": "Up to 25% for indirect costs"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "fixed_per_year",
+          "amount_per_year": 750000,
+          "notes": "750tkr/yr"
+        },
+        {
+          "name": "Faculty (NT)",
+          "mode": "fixed_per_year",
+          "amount_per_year": 250000,
+          "notes": "250tkr/yr"
+        }
+      ]
+    },
+    {
+      "id": "erc_adv",
+      "name": "ERC – Advanced Grant",
+      "funder": {
+        "mode": "percent_total",
+        "value": 25,
+        "label": "Up to 25% for indirect costs"
+      },
+      "uf_rules": [
+        {
+          "name": "Faculty",
+          "mode": "percent_total",
+          "value": 5,
+          "notes": "5% of total"
+        }
+      ]
+    },
+    {
+      "id": "erc_syg",
+      "name": "ERC – Synergy Grant",
+      "funder": {
+        "mode": "percent_total",
+        "value": 25,
+        "label": "Up to 25% for indirect costs"
+      },
+      "uf_rules": [
+        {
+          "name": "Vice Chancellor",
+          "mode": "fixed_per_year",
+          "amount_per_year": 750000,
+          "notes": "750tkr/yr"
+        }
+      ]
+    },
+
+    {
+      "id": "horizon",
+      "name": "EU – Horizon",
+      "funder": {
+        "mode": "percent_overhead",
+        "value": 25,
+        "label": "Up to 25% for indirect costs"
+      },
+      "uf_rules": [
+        {
+          "name": "University",
+          "mode": "oh_gap_share",
+          "value": 50,
+          "notes": "50% of remaining indirect costs above the 25% covered by the funder"
+        },
+        {
+          "name": "Faculty",
+          "mode": "oh_gap_share",
+          "value": 50,
+          "notes": "50% of remaining indirect costs above the 25% covered by the funder"
+        }
+      ]
+    },
+    {
+      "id": "scilifelab",
+      "name": "SciLifeLab – Infrastructure",
+      "funder": {
+        "mode": "none",
+        "value": 0,
+        "label": "No coverage of indirect costs"
+      },
+      "uf_rules": [
+        {
+          "name": "University",
+          "mode": "percent_total",
+          "value": 25,
+          "notes": "25% of total"
+        },
+        {
+          "name": "Faculty",
+          "mode": "percent_total",
+          "value": 5,
+          "notes": "5% of total"
+        }
+      ]
+    },
+    {
+      "id": "ssf",
+      "name": "SSF",
+      "funder": {
+        "mode": "percent_overhead",
+        "value": 25,
+        "label": "Covers an overhead level up to 25% on direct costs"
+      },
+      "uf_rules": [
+        {
+          "name": "University",
+          "mode": "fixed_per_year",
+          "amount_per_year": 750000,
+          "notes": "750tkr/yr"
+        }
+      ]
+    },
+    {
+      "id": "ssf_frl",
+      "name": "SSF – Future Research Leaders",
+      "funder": {
+        "mode": "percent_overhead",
+        "value": 25,
+        "label": "Covers an overhead level up to 25% on direct costs"
+      },
+      "uf_rules": [
+        {
+          "name": "University",
+          "mode": "fixed_per_year",
+          "amount_per_year": 750000,
+          "notes": "750tkr/yr"
+        }
+      ]
+    },
+    {
+      "id": "other",
+      "name": "Other",
+      "funder": {
+        "mode": "manual",
+        "value": null,
+        "label": "Manual entry"
+      },
+      "uf_rules": []
+    }
+  ]
+}
