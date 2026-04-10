@@ -2,36 +2,89 @@ import { useState, useEffect, Fragment } from 'react';
 import { calculateFinancials, Config, Scheme, CalculationInputs, fmt } from './logic/math';
 import { t, Language } from './logic/i18n';
 
+const DEFAULT_INPUTS: CalculationInputs = {
+    requestedAmount: 0,
+    projectYears: 4,
+    staffFTE: 1,
+    plannedSalaryDirect: 0,
+    existingSalaries: 0,
+    servicePurchases: 0,
+    funderMode: 'percent_overhead',
+    funderValue: 0
+};
+
+type PrefillState = {
+    callTitle: string | null;
+    sourceUrl: string | null;
+    schemeId: string | null;
+    inputs: CalculationInputs;
+};
+
+function parseNumberParam(params: URLSearchParams, key: string): number | null {
+    const raw = params.get(key);
+    if (!raw) return null;
+    const parsed = Number.parseFloat(raw);
+    return Number.isFinite(parsed) ? parsed : null;
+}
+
+function getPrefillState(): PrefillState {
+    const params = new URLSearchParams(window.location.search);
+
+    const requestedAmount = parseNumberParam(params, 'requestedAmount');
+    const projectYears = parseNumberParam(params, 'projectYears');
+    const staffFTE = parseNumberParam(params, 'staffFTE');
+    const plannedSalaryDirect = parseNumberParam(params, 'plannedSalaryDirect');
+    const existingSalaries = parseNumberParam(params, 'existingSalaries');
+    const servicePurchases = parseNumberParam(params, 'servicePurchases');
+    const funderValue = parseNumberParam(params, 'funderValue');
+    const funderMode = params.get('funderMode');
+
+    return {
+        callTitle: params.get('callTitle'),
+        sourceUrl: params.get('sourceUrl'),
+        schemeId: params.get('scheme'),
+        inputs: {
+            ...DEFAULT_INPUTS,
+            ...(requestedAmount !== null ? { requestedAmount } : {}),
+            ...(projectYears !== null ? { projectYears } : {}),
+            ...(staffFTE !== null ? { staffFTE } : {}),
+            ...(plannedSalaryDirect !== null ? { plannedSalaryDirect } : {}),
+            ...(existingSalaries !== null ? { existingSalaries } : {}),
+            ...(servicePurchases !== null ? { servicePurchases } : {}),
+            ...(funderValue !== null ? { funderValue } : {}),
+            ...((funderMode === 'percent_overhead' || funderMode === 'absolute' || funderMode === 'percent_total')
+                ? { funderMode }
+                : {})
+        }
+    };
+}
+
 export default function App() {
     const [lang, setLang] = useState<Language>('en');
     const [config, setConfig] = useState<Config | null>(null);
     const [activeScheme, setActiveScheme] = useState<Scheme | null>(null);
-    const [inputs, setInputs] = useState<CalculationInputs>({
-        requestedAmount: 0,
-        projectYears: 4,
-        staffFTE: 1,
-        plannedSalaryDirect: 0,
-        existingSalaries: 0,
-        servicePurchases: 0,
-        funderMode: 'percent_overhead',
-        funderValue: 0
-    });
+    const [inputs, setInputs] = useState<CalculationInputs>(DEFAULT_INPUTS);
     const [results, setResults] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
+    const [prefillState] = useState<PrefillState>(() => getPrefillState());
 
     useEffect(() => {
         fetch('./config.json')
             .then(res => res.json())
             .then(data => {
                 setConfig(data);
-                const defaultS = data.schemes.find((s: Scheme) => s.id === data.defaultScheme) || data.schemes[0];
-                setActiveScheme(defaultS);
+                const selectedScheme =
+                    data.schemes.find((s: Scheme) => s.id === prefillState.schemeId) ||
+                    data.schemes.find((s: Scheme) => s.id === data.defaultScheme) ||
+                    data.schemes[0];
+                setActiveScheme(selectedScheme);
+                setInputs(prefillState.inputs);
             })
             .catch(err => {
                 console.error('Failed to load config', err);
                 setError('Could not load configuration. Using local defaults.');
             });
-    }, []);
+    }, [prefillState.inputs, prefillState.schemeId]);
 
     const handleCalculate = () => {
         if (!activeScheme || !config) return;
@@ -45,16 +98,14 @@ export default function App() {
     };
 
     const handleReset = () => {
-        setInputs({
-            requestedAmount: 0,
-            projectYears: 4,
-            staffFTE: 1,
-            plannedSalaryDirect: 0,
-            existingSalaries: 0,
-            servicePurchases: 0,
-            funderMode: 'percent_overhead',
-            funderValue: 0
-        });
+        setInputs(prefillState.inputs);
+        if (config) {
+            const selectedScheme =
+                config.schemes.find((s: Scheme) => s.id === prefillState.schemeId) ||
+                config.schemes.find((s: Scheme) => s.id === config.defaultScheme) ||
+                config.schemes[0];
+            setActiveScheme(selectedScheme);
+        }
         setResults(null);
     };
 
@@ -79,6 +130,18 @@ export default function App() {
                     </div>
                     {error && <div className="pill error">{error}</div>}
                 </div>
+                {(prefillState.callTitle || prefillState.sourceUrl) && (
+                    <div className="help" style={{ marginTop: '12px' }}>
+                        <span className="pill">
+                            Loaded from funding call{prefillState.callTitle ? `: ${prefillState.callTitle}` : ''}
+                        </span>
+                        {prefillState.sourceUrl && (
+                            <a href={prefillState.sourceUrl} target="_blank" rel="noreferrer" style={{ marginLeft: '10px' }}>
+                                Open source call
+                            </a>
+                        )}
+                    </div>
+                )}
             </div>
 
             <div className="section">
