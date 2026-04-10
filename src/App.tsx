@@ -137,7 +137,7 @@ export default function App() {
                         </span>
                         {prefillState.sourceUrl && (
                             <a href={prefillState.sourceUrl} target="_blank" rel="noreferrer" style={{ marginLeft: '10px' }}>
-                                Open source call
+                                Open call
                             </a>
                         )}
                     </div>
