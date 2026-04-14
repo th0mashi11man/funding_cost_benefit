@@ -60,6 +60,16 @@
       },
       "uf_rules": []
     },
+    {
+      "id": "nordforsk",
+      "name": "NordForsk",
+      "funder": {
+        "mode": "percent_overhead",
+        "value": 100,
+        "label": "All indirect costs covered in budget"
+      },
+      "uf_rules": []
+    },
 
     {
       "id": "kaw_potential",
